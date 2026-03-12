@@ -1,0 +1,34 @@
+package ifb.edu.br.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "Usuarios")
+@Data                   
+@NoArgsConstructor      
+@AllArgsConstructor     
+@Builder                
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_User")
+    private Integer id;
+
+    @Column(name = "Name", length = 50, nullable = false)
+    private String name;
+
+    @Column(name = "email", length = 50, nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "Senha_hash", length = 50, nullable = false)
+    private String senhaHash;
+
+    @Column(name = "data_cadastro")
+    private LocalDate dataCadastro;
+
+    @Column(name = "is_admin")
+    private Boolean isAdmin;
+}
