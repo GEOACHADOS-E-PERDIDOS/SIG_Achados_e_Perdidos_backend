@@ -1,7 +1,7 @@
 package ifb.edu.br.service;
 
-import ifb.edu.br.model.User;
-import ifb.edu.br.repository.UserRepository;
+import ifb.edu.br.model.Usuario;
+import ifb.edu.br.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -9,44 +9,44 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UsuarioService {
 
-    private final UserRepository userRepository;
+    private final UsuarioRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UsuarioService(UsuarioRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public User criarUsuario(User user) {
+    public Usuario criarUsuario(Usuario user) {
         user.setDataCadastro(LocalDate.now());
         return userRepository.save(user);
     }
 
-    public List<User> listarTodos() {
+    public List<Usuario> listarTodos() {
         return userRepository.findAll();
     }
 
-    public Optional<User> buscarPorId(Integer id) {
+    public Optional<Usuario> buscarPorId(Integer id) {
         return userRepository.findById(id);
     }
 
-    public Optional<User> buscarPorEmail(String email) {
+    public Optional<Usuario> buscarPorEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    public List<User> buscarPorNome(String name) {
+    public List<Usuario> buscarPorNome(String name) {
         return userRepository.findByName(name);
     }
 
-    public List<User> buscarPorDataCadastro(LocalDate data) {
+    public List<Usuario> buscarPorDataCadastro(LocalDate data) {
         return userRepository.findByDataCadastro(data);
     }
 
-    public List<User> listarAdmins() {
+    public List<Usuario> listarAdmins() {
         return userRepository.findByIsAdmin(true);
     }
 
-    public User atualizarUsuario(Integer id, User userAtualizado) {
+    public Usuario atualizarUsuario(Integer id, Usuario userAtualizado) {
         return userRepository.findById(id)
                 .map(user -> {
                     user.setName(userAtualizado.getName());

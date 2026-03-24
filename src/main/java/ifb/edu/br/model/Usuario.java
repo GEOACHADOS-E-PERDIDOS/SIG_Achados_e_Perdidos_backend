@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 
+
 @Entity
 @Table(name = "Usuarios")
 @Data                   
 @NoArgsConstructor      
 @AllArgsConstructor     
 @Builder                
-public class User {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +24,8 @@ public class User {
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "Senha_hash", length = 50, nullable = false)
+//    @JsonIgnore - Implementar isso depois 
+    @Column(name = "senha_hash", length = 50, nullable = false)
     private String senhaHash;
 
     @Column(name = "data_cadastro")
