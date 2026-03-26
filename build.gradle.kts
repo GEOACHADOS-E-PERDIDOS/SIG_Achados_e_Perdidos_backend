@@ -26,6 +26,8 @@ dependencies {
 	implementation ("org.springframework.boot:spring-boot-starter-security")
     implementation ("io.jsonwebtoken:jjwt-api:0.13.0")
 
+    implementation("io.minio:minio:9.0.0")
+
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	

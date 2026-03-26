@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
@@ -21,34 +22,41 @@ public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-  @Bean
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-            .csrf(csrf -> csrf.disable()) 
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-             .authorizeHttpRequests(
-                auth -> auth
-                .requestMatchers(HttpMethod.POST,"/auth/**").permitAll()
-                .requestMatchers("/users/**").hasRole("ADMIN") 
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .build();
+                .cors(cors -> {
+                })
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(
+                        auth -> auth
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/registrar").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/recuperar-senha").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/trocar-senha").authenticated()
+                                .requestMatchers("/objetos/**").authenticated()
+                                .requestMatchers("/users/**").hasRole("ADMIN")
+                                .requestMatchers("/uploads/**").authenticated()
+                                .anyRequest().authenticated()
+                            )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+    /*
+     * @Bean
+     * public PasswordEncoder passwordEncoder() {
+     * return new BCryptPasswordEncoder();
+     * }
+     */
 
-        
-}
-/* 
-  @Bean
+    @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-        }
-        */ 
-       
-       @Bean
-       public PasswordEncoder passwordEncoder() {
-           return NoOpPasswordEncoder.getInstance();
-       }
-       @Bean
+        return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }

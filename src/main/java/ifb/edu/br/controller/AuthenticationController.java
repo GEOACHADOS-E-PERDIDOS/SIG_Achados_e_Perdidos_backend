@@ -1,7 +1,8 @@
 package ifb.edu.br.controller;
 
+import ifb.edu.br.dto.LoginRequest;
+import ifb.edu.br.dto.NovaSenhaRequest;
 import ifb.edu.br.model.Usuario;
-import ifb.edu.br.security.LoginRequest;
 import ifb.edu.br.security.UsuarioLogin;
 import ifb.edu.br.security.TokenService;
 import ifb.edu.br.security.UsuarioDetailsServiceImpl;
@@ -15,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -27,31 +30,30 @@ public class AuthenticationController {
     private final TokenService tokenService;
     private final UsuarioService userService;
 
-@PostMapping("/login")
-public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-    try {
-        var authToken = new UsernamePasswordAuthenticationToken(
-                loginRequest.email(),
-                loginRequest.senha()
-        );
-        authenticationManager.authenticate(authToken);
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            var authToken = new UsernamePasswordAuthenticationToken(
+                    loginRequest.email(),
+                    loginRequest.senha());
+            authenticationManager.authenticate(authToken);
 
-        UsuarioLogin loginUser = (UsuarioLogin) userDetailsService.loadUserByUsername(loginRequest.email());
-        Usuario user = loginUser.getUser();
+            UsuarioLogin loginUser = (UsuarioLogin) userDetailsService.loadUserByUsername(loginRequest.email());
+            Usuario user = loginUser.getUser();
 
-        String token = tokenService.gerarToken(
-                user.getEmail(),
-                Map.of("name", user.getName(), "isAdmin", user.getIsAdmin())
-        );
+            String token = tokenService.gerarToken(
+                    user.getEmail(),
+                    Map.of("name", user.getName(), "isAdmin", user.getIsAdmin()));
 
-        return ResponseEntity.ok("Login realizado com sucesso! Usuário: " + user.getName() 
-                + "\nToken: " + token);
+            return ResponseEntity.ok("Login realizado com sucesso! Usuário: " + user.getName()
+                    + "\nToken: " + token);
 
-    } catch (AuthenticationException ex) {
-        return ResponseEntity.status(401).body("Usuário ou senha inválidos");
+        } catch (AuthenticationException ex) {
+            return ResponseEntity.status(401).body("Usuário ou senha inválidos");
+        }
     }
-}
-    @PostMapping("/register")
+
+    @PostMapping("/registrar")
     public ResponseEntity<String> registro(@RequestBody Usuario user) {
         boolean emailExiste = userService.buscarPorEmail(user.getEmail()).isPresent();
         if (emailExiste) {
@@ -60,9 +62,46 @@ public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
 
         user.setDataCadastro(LocalDate.now());
         user.setIsAdmin(false);
-        userService.criarUsuario(user); 
+        userService.criarUsuario(user);
 
         return ResponseEntity.ok("Usuário registrado com sucesso!");
     }
 
+    @PostMapping("/recuperar-senha")
+    public ResponseEntity<String> recuperarSenha(@RequestParam String email) {
+        var usuarioOpt = userService.buscarPorEmail(email);
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Email não cadastrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        String senhaTemp = gerarSenhaTemporaria();
+        usuario.setSenhaHash(senhaTemp);
+        userService.atualizarUsuario(usuario.getId(), usuario);
+        return ResponseEntity.ok("Senha temporária: " + senhaTemp);
+    }
+
+    @PostMapping("/trocar-senha")
+    public ResponseEntity<String> trocarSenha(@RequestBody NovaSenhaRequest request,
+            @AuthenticationPrincipal UsuarioLogin usuarioLogado) {
+
+        Usuario usuario = usuarioLogado.getUser();
+
+        usuario.setSenhaHash(request.novaSenha());
+        userService.atualizarUsuario(usuario.getId(), usuario);
+
+        return ResponseEntity.ok("Senha atualizada com sucesso!");
+    }
+
+    private String gerarSenhaTemporaria() {
+        int tamanho = 8;
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < tamanho; i++) {
+            int idx = (int) (Math.random() * chars.length());
+            sb.append(chars.charAt(idx));
+        }
+        return sb.toString();
+    }
 }

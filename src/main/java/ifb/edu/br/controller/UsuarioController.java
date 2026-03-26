@@ -2,6 +2,7 @@ package ifb.edu.br.controller;
 
 import ifb.edu.br.model.Usuario;
 import ifb.edu.br.service.UsuarioService;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,14 +13,11 @@ import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/usuario")
+@RequiredArgsConstructor
 public class UsuarioController {
 
     private final UsuarioService userService;
-
-    public UsuarioController(UsuarioService userService) {
-        this.userService = userService;
-    }
 
     @PostMapping
     public ResponseEntity<String> criarUsuario(@RequestBody Usuario user) {
