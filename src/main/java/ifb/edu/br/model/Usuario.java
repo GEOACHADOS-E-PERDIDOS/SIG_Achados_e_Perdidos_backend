@@ -33,4 +33,7 @@ public class Usuario {
 
     @Column(name = "is_admin")
     private Boolean isAdmin;
+
+    @Column(name = "senha_temporaria")
+    private Boolean senhaTemporaria;
 }

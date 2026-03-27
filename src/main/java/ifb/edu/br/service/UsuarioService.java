@@ -54,6 +54,7 @@ public class UsuarioService {
                     user.setEmail(userAtualizado.getEmail());
                     user.setSenhaHash(userAtualizado.getSenhaHash());
                     user.setIsAdmin(userAtualizado.getIsAdmin());
+                    user.setSenhaTemporaria(userAtualizado.getSenhaTemporaria());
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));

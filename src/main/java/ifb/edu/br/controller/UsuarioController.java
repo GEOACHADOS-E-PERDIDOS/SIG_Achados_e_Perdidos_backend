@@ -28,6 +28,7 @@ public class UsuarioController {
 
         user.setDataCadastro(LocalDate.now());
         user.setIsAdmin(false);
+        user.setSenhaTemporaria(false);
         userService.criarUsuario(user); 
 
         return ResponseEntity.ok("Usuário registrado com sucesso!");

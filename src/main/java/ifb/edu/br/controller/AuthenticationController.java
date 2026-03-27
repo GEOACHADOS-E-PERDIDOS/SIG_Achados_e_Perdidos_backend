@@ -50,6 +50,7 @@ public class AuthenticationController {
             resposta.put("mensagem", "Login realizado com sucesso!");
             resposta.put("usuario", user.getName());
             resposta.put("token", token);
+            resposta.put("isTemp", user.getSenhaTemporaria());
 
             return ResponseEntity.ok(resposta);
 
@@ -67,6 +68,7 @@ public class AuthenticationController {
 
         user.setDataCadastro(LocalDate.now());
         user.setIsAdmin(false);
+        user.setSenhaTemporaria(false);
         userService.criarUsuario(user);
 
         return ResponseEntity.ok("Usuário registrado com sucesso!");
@@ -83,6 +85,7 @@ public class AuthenticationController {
 
         String senhaTemp = gerarSenhaTemporaria();
         usuario.setSenhaHash(senhaTemp);
+        usuario.setSenhaTemporaria(true);
         userService.atualizarUsuario(usuario.getId(), usuario);
         return ResponseEntity.ok("Senha temporária: " + senhaTemp);
     }
@@ -94,6 +97,7 @@ public class AuthenticationController {
         Usuario usuario = usuarioLogado.getUser();
 
         usuario.setSenhaHash(request.novaSenha());
+        usuario.setSenhaTemporaria(false);
         userService.atualizarUsuario(usuario.getId(), usuario);
 
         return ResponseEntity.ok("Senha atualizada com sucesso!");
