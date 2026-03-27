@@ -10,6 +10,7 @@ import ifb.edu.br.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class AuthenticationController {
     private final UsuarioService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
         try {
             var authToken = new UsernamePasswordAuthenticationToken(
                     loginRequest.email(),
@@ -45,11 +46,15 @@ public class AuthenticationController {
                     user.getEmail(),
                     Map.of("name", user.getName(), "isAdmin", user.getIsAdmin()));
 
-            return ResponseEntity.ok("Login realizado com sucesso! Usuário: " + user.getName()
-                    + "\nToken: " + token);
+            Map<String, Object> resposta = new HashMap<>();
+            resposta.put("mensagem", "Login realizado com sucesso!");
+            resposta.put("usuario", user.getName());
+            resposta.put("token", token);
+
+            return ResponseEntity.ok(resposta);
 
         } catch (AuthenticationException ex) {
-            return ResponseEntity.status(401).body("Usuário ou senha inválidos");
+            return ResponseEntity.status(401).body(Map.of("erro", "Usuário ou senha inválidos"));
         }
     }
 
