@@ -68,7 +68,6 @@ public class PostoRetiradaService {
                 .orElseThrow(() -> new RuntimeException("Posto não encontrado com ID: " + id));
     }
 
-    // ❌ Deletar
     public void deletar(Integer id) {
         if (!postoRepository.existsById(id)) {
             throw new RuntimeException("Posto não encontrado com ID: " + id);
@@ -86,8 +85,4 @@ public class PostoRetiradaService {
         return postoRepository.findByEnderecoContainingIgnoreCase(endereco);
     }
 
-    // 🔍 Buscar por email
-    public List<PostoRetirada> buscarPorEmail(String email) {
-        return postoRepository.findByEmailContainingIgnoreCase(email);
-    }
 }

@@ -1,6 +1,9 @@
 package ifb.edu.br.dto;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import ifb.edu.br.model.Categoria;
 
 public record ObjetoResponse(
         Integer id,
@@ -10,5 +13,6 @@ public record ObjetoResponse(
         LocalDate dataEncontro,
         String caminhoImagem,
         Double latitude,
-        Double longitude
+        Double longitude,
+        List<Categoria> categorias
 ) {}

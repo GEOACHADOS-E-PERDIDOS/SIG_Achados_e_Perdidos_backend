@@ -45,65 +45,33 @@ public class ObjetoController {
                             })
                             .toList());
         }
+
         objeto = objetoService.salvarComImagem(
                 objeto,
                 objetoRequest.latitude(),
                 objetoRequest.longitude(),
                 imagem);
-        Point geom = objeto.getGeom();
 
-        ObjetoResponse response = new ObjetoResponse(
-                objeto.getId(),
-                objeto.getNome(),
-                objeto.getDescricao(),
-                objeto.getEnderecoEncontro(),
-                objeto.getDataEncontro(),
-                objeto.getImagemObjeto() != null ? objeto.getImagemObjeto().getCaminhoImagem() : null,
-                geom != null ? geom.getY() : null,
-                geom != null ? geom.getX() : null);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(mapToResponse(objeto));
     }
 
     @GetMapping
     public ResponseEntity<List<ObjetoResponse>> listarTodos() {
         List<Objeto> objetos = objetoService.listarTodos();
 
-        List<ObjetoResponse> responses = objetos.stream()
-                .map(objeto -> {
-                    Point geom = objeto.getGeom();
-                    return new ObjetoResponse(
-                            objeto.getId(),
-                            objeto.getNome(),
-                            objeto.getDescricao(),
-                            objeto.getEnderecoEncontro(),
-                            objeto.getDataEncontro(),
-                            objeto.getImagemObjeto() != null ? objeto.getImagemObjeto().getCaminhoImagem() : null,
-                            geom != null ? geom.getY() : null,
-                            geom != null ? geom.getX() : null);
-                })
-                .toList();
-
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.ok(
+                objetos.stream()
+                        .map(this::mapToResponse)
+                        .toList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ObjetoResponse> buscarPorId(@PathVariable Integer id) {
         Optional<Objeto> objetoOpt = objetoService.buscarPorId(id);
 
-        return objetoOpt.map(objeto -> {
-            Point geom = objeto.getGeom();
-            ObjetoResponse response = new ObjetoResponse(
-                    objeto.getId(),
-                    objeto.getNome(),
-                    objeto.getDescricao(),
-                    objeto.getEnderecoEncontro(),
-                    objeto.getDataEncontro(),
-                    objeto.getImagemObjeto() != null ? objeto.getImagemObjeto().getCaminhoImagem() : null,
-                    geom != null ? geom.getY() : null,
-                    geom != null ? geom.getX() : null);
-            return ResponseEntity.ok(response);
-        }).orElse(ResponseEntity.notFound().build());
+        return objetoOpt
+                .map(objeto -> ResponseEntity.ok(mapToResponse(objeto)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
@@ -134,18 +102,8 @@ public class ObjetoController {
                     objetoRequest.latitude(),
                     objetoRequest.longitude());
 
-            Point geom = atualizado.getGeom();
-            ObjetoResponse response = new ObjetoResponse(
-                    atualizado.getId(),
-                    atualizado.getNome(),
-                    atualizado.getDescricao(),
-                    atualizado.getEnderecoEncontro(),
-                    atualizado.getDataEncontro(),
-                    atualizado.getImagemObjeto() != null ? atualizado.getImagemObjeto().getCaminhoImagem() : null,
-                    geom != null ? geom.getY() : null,
-                    geom != null ? geom.getX() : null);
+            return ResponseEntity.ok(mapToResponse(atualizado));
 
-            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -191,6 +149,7 @@ public class ObjetoController {
 
     private ObjetoResponse mapToResponse(Objeto objeto) {
         Point geom = objeto.getGeom();
+
         return new ObjetoResponse(
                 objeto.getId(),
                 objeto.getNome(),
@@ -199,6 +158,7 @@ public class ObjetoController {
                 objeto.getDataEncontro(),
                 objeto.getImagemObjeto() != null ? objeto.getImagemObjeto().getCaminhoImagem() : null,
                 geom != null ? geom.getY() : null,
-                geom != null ? geom.getX() : null);
+                geom != null ? geom.getX() : null,
+                objeto.getCategorias() != null ? objeto.getCategorias() : List.of());
     }
 }

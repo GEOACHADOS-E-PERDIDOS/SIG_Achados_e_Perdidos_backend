@@ -54,7 +54,6 @@ public class PostoRetiradaController {
         return ResponseEntity.ok(response);
     }
 
-    // 📋 Listar todos
     @GetMapping
     public ResponseEntity<List<PostoRetiradaResponse>> listarTodos() {
         List<PostoRetirada> postos = postoService.listarTodos();
