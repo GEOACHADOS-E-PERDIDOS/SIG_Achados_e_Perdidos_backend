@@ -43,6 +43,10 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.DELETE, "/categorias/**").hasRole("ADMIN")
                                 .requestMatchers("/users/**").hasRole("ADMIN")
                                 .requestMatchers("/uploads/**").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/postos/**").authenticated()
+                                .requestMatchers(HttpMethod.POST, "/postos/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/postos/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/postos/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
