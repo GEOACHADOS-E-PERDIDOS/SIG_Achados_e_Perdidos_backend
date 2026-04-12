@@ -2,11 +2,11 @@ package ifb.edu.br.controller;
 
 import ifb.edu.br.dto.ObjetoRequest;
 import ifb.edu.br.dto.ObjetoResponse;
+import ifb.edu.br.model.Categoria;
 import ifb.edu.br.model.Objeto;
 import ifb.edu.br.service.MinioService;
 import ifb.edu.br.service.ObjetoService;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +35,16 @@ public class ObjetoController {
         objeto.setEnderecoEncontro(objetoRequest.enderecoEncontro());
         objeto.setDataEncontro(LocalDate.parse(objetoRequest.dataEncontro()));
 
+        if (objetoRequest.categorias() != null) {
+            objeto.setCategorias(
+                    objetoRequest.categorias().stream()
+                            .map(id -> {
+                                Categoria c = new Categoria();
+                                c.setId(id);
+                                return c;
+                            })
+                            .toList());
+        }
         objeto = objetoService.salvarComImagem(
                 objeto,
                 objetoRequest.latitude(),
@@ -107,6 +117,17 @@ public class ObjetoController {
             objetoAtualizado.setEnderecoEncontro(objetoRequest.enderecoEncontro());
             objetoAtualizado.setDataEncontro(LocalDate.parse(objetoRequest.dataEncontro()));
 
+            if (objetoRequest.categorias() != null) {
+                objetoAtualizado.setCategorias(
+                        objetoRequest.categorias().stream()
+                                .map(idCat -> {
+                                    Categoria c = new Categoria();
+                                    c.setId(idCat);
+                                    return c;
+                                })
+                                .toList());
+            }
+
             Objeto atualizado = objetoService.atualizar(
                     id,
                     objetoAtualizado,
@@ -140,45 +161,44 @@ public class ObjetoController {
         }
     }
 
-@GetMapping(value = "/buscar", params = "nome")
-public ResponseEntity<List<ObjetoResponse>> buscarPorNome(@RequestParam String nome) {
-    List<Objeto> objetos = objetoService.buscarPorNome(nome);
-    List<ObjetoResponse> responses = objetos.stream()
-            .map(this::mapToResponse)
-            .toList();
-    return ResponseEntity.ok(responses);
-}
+    @GetMapping(value = "/buscar", params = "nome")
+    public ResponseEntity<List<ObjetoResponse>> buscarPorNome(@RequestParam String nome) {
+        List<Objeto> objetos = objetoService.buscarPorNome(nome);
+        List<ObjetoResponse> responses = objetos.stream()
+                .map(this::mapToResponse)
+                .toList();
+        return ResponseEntity.ok(responses);
+    }
 
-@GetMapping(value = "/buscar", params = "data")
-public ResponseEntity<List<ObjetoResponse>> buscarPorData(@RequestParam String data) {
-    LocalDate dataConvertida = LocalDate.parse(data);
-    List<Objeto> objetos = objetoService.buscarPorData(dataConvertida);
-    List<ObjetoResponse> responses = objetos.stream()
-            .map(this::mapToResponse)
-            .toList();
-    return ResponseEntity.ok(responses);
-}
+    @GetMapping(value = "/buscar", params = "data")
+    public ResponseEntity<List<ObjetoResponse>> buscarPorData(@RequestParam String data) {
+        LocalDate dataConvertida = LocalDate.parse(data);
+        List<Objeto> objetos = objetoService.buscarPorData(dataConvertida);
+        List<ObjetoResponse> responses = objetos.stream()
+                .map(this::mapToResponse)
+                .toList();
+        return ResponseEntity.ok(responses);
+    }
 
-@GetMapping("/buscar/posto/{idPosto}")
-public ResponseEntity<List<ObjetoResponse>> buscarPorPosto(@PathVariable Integer idPosto) {
-    List<Objeto> objetos = objetoService.buscarPorPosto(idPosto);
-    List<ObjetoResponse> responses = objetos.stream()
-            .map(this::mapToResponse)
-            .toList();
-    return ResponseEntity.ok(responses);
-}
+    @GetMapping("/buscar/posto/{idPosto}")
+    public ResponseEntity<List<ObjetoResponse>> buscarPorPosto(@PathVariable Integer idPosto) {
+        List<Objeto> objetos = objetoService.buscarPorPosto(idPosto);
+        List<ObjetoResponse> responses = objetos.stream()
+                .map(this::mapToResponse)
+                .toList();
+        return ResponseEntity.ok(responses);
+    }
 
-private ObjetoResponse mapToResponse(Objeto objeto) {
-    Point geom = objeto.getGeom();
-    return new ObjetoResponse(
-            objeto.getId(),
-            objeto.getNome(),
-            objeto.getDescricao(),
-            objeto.getEnderecoEncontro(),
-            objeto.getDataEncontro(),
-            objeto.getImagemObjeto() != null ? objeto.getImagemObjeto().getCaminhoImagem() : null,
-            geom != null ? geom.getY() : null,
-            geom != null ? geom.getX() : null
-    );
-}
+    private ObjetoResponse mapToResponse(Objeto objeto) {
+        Point geom = objeto.getGeom();
+        return new ObjetoResponse(
+                objeto.getId(),
+                objeto.getNome(),
+                objeto.getDescricao(),
+                objeto.getEnderecoEncontro(),
+                objeto.getDataEncontro(),
+                objeto.getImagemObjeto() != null ? objeto.getImagemObjeto().getCaminhoImagem() : null,
+                geom != null ? geom.getY() : null,
+                geom != null ? geom.getX() : null);
+    }
 }

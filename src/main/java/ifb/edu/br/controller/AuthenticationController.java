@@ -102,7 +102,13 @@ public class AuthenticationController {
 
         return ResponseEntity.ok("Senha atualizada com sucesso!");
     }
+    @GetMapping("/admin/check")
+    public ResponseEntity<Boolean> checkAdmin(@AuthenticationPrincipal UsuarioLogin usuarioLogado) {
+        if (usuarioLogado == null) return ResponseEntity.status(401).body(false);
 
+        Usuario user = usuarioLogado.getUser();
+        return ResponseEntity.ok(user.getIsAdmin());
+    }
     private String gerarSenhaTemporaria() {
         int tamanho = 8;
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

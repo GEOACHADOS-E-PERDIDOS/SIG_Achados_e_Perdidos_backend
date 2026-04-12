@@ -13,10 +13,10 @@ public interface ObjetoRepository extends JpaRepository<Objeto, Integer> {
 
     List<Objeto> findByNomeContainingIgnoreCase(String nome);
 
-    // 🔎 Buscar por data de encontro
     List<Objeto> findByDataEncontro(LocalDate dataEncontro);
 
-    // 🔎 Buscar por posto de retirada
     List<Objeto> findByPostoRetirada_Id(Integer idPosto);
+
+    List<Objeto> findByCategorias_Id(Integer idCategoria);
 
 }

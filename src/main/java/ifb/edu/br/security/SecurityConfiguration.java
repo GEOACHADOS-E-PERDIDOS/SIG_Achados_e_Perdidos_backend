@@ -37,10 +37,13 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/auth/recuperar-senha").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/auth/trocar-senha").authenticated()
                                 .requestMatchers("/objetos/**").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/categorias/**").authenticated()
+                                .requestMatchers(HttpMethod.POST, "/categorias/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/categorias/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/categorias/**").hasRole("ADMIN")
                                 .requestMatchers("/users/**").hasRole("ADMIN")
                                 .requestMatchers("/uploads/**").authenticated()
-                                .anyRequest().authenticated()
-                            )
+                                .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

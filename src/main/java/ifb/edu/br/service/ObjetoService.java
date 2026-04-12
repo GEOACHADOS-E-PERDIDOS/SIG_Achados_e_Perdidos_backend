@@ -4,10 +4,12 @@ import ifb.edu.br.model.Objeto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import ifb.edu.br.repository.CategoriaRepository;
 import ifb.edu.br.repository.ObjetoRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -21,6 +23,7 @@ public class ObjetoService {
 
     private final ObjetoRepository objetoRepository;
     private final ImagemObjetoService imagemObjetoService;
+    private final CategoriaRepository categoriaRepository;
 
     public Objeto salvarComImagem(Objeto objeto,
             double latitude,
@@ -35,7 +38,14 @@ public class ObjetoService {
             objeto.setImagemObjeto(
                     imagemObjetoService.salvarImagem(imagem));
         }
-
+        if (objeto.getCategorias() != null && !objeto.getCategorias().isEmpty()) {
+            objeto.setCategorias(
+                    objeto.getCategorias().stream()
+                            .map(cat -> categoriaRepository.findById(cat.getId())
+                                    .orElseThrow(
+                                            () -> new RuntimeException("Categoria não encontrada: " + cat.getId())))
+                            .toList());
+        }
         return objetoRepository.save(objeto);
     }
 
@@ -60,6 +70,18 @@ public class ObjetoService {
                     objeto.setPostoRetirada(objetoAtualizado.getPostoRetirada());
                     objeto.setImagemObjeto(objetoAtualizado.getImagemObjeto());
                     objeto.setGeom(ponto);
+
+                    if (objetoAtualizado.getCategorias() != null && !objetoAtualizado.getCategorias().isEmpty()) {
+                        objeto.setCategorias(
+                                objetoAtualizado.getCategorias().stream()
+                                        .map(cat -> categoriaRepository.findById(cat.getId())
+                                                .orElseThrow(() -> new RuntimeException(
+                                                        "Categoria não encontrada: " + cat.getId())))
+                                        .toList());
+                    } else {
+                        objeto.setCategorias(new ArrayList<>());
+                    }
+
                     return objetoRepository.save(objeto);
                 })
                 .orElseThrow(() -> new RuntimeException("Objeto não encontrado com ID: " + id));
@@ -82,5 +104,9 @@ public class ObjetoService {
 
     public List<Objeto> buscarPorPosto(Integer idPosto) {
         return objetoRepository.findByPostoRetirada_Id(idPosto);
+    }
+
+    public List<Objeto> buscarPorCategoria(Integer idCategoria) {
+        return objetoRepository.findByCategorias_Id(idCategoria);
     }
 }

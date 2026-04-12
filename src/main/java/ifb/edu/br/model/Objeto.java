@@ -3,6 +3,8 @@ package ifb.edu.br.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.List;
+
 import org.locationtech.jts.geom.Point;
 
 @Entity
@@ -14,7 +16,7 @@ import org.locationtech.jts.geom.Point;
 public class Objeto {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_objeto")
     private Integer id;
 
@@ -40,4 +42,8 @@ public class Objeto {
 
     @Column(name = "geom", columnDefinition = "Geometry(Point,4326)")
     private Point geom;
+
+    @ManyToMany
+    @JoinTable(name = "Objeto_Categoria", joinColumns = @JoinColumn(name = "ID_objeto"), inverseJoinColumns = @JoinColumn(name = "ID_categoria"))
+    private List<Categoria> categorias;
 }
