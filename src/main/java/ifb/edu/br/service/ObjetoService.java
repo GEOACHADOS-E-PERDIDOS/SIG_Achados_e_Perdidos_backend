@@ -2,6 +2,8 @@ package ifb.edu.br.service;
 
 import ifb.edu.br.model.Categoria;
 import ifb.edu.br.model.Objeto;
+import ifb.edu.br.model.StatusObjeto;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -95,8 +97,8 @@ public class ObjetoService {
         objetoRepository.deleteById(id);
     }
 
-    public List<Objeto> buscar(String termo, LocalDate data, Integer categoria) {
-        return objetoRepository.buscarDinamico(termo, data, categoria);
+    public List<Objeto> buscar(String termo, LocalDate data, Integer categoria, StatusObjeto status) {
+        return objetoRepository.buscarDinamico(termo, data, categoria, status);
     }
 
     public List<Objeto> buscarPorPosto(Integer idPosto) {

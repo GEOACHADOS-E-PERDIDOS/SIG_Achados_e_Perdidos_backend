@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import ifb.edu.br.model.Objeto;
+import ifb.edu.br.model.StatusObjeto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,9 +31,11 @@ public interface ObjetoRepository extends JpaRepository<Objeto, Integer> {
                    LOWER(o.enderecoEncontro) LIKE LOWER(CONCAT('%', :termo, '%')))
             AND (:data IS NULL OR o.dataEncontro = :data)
             AND (:categoria IS NULL OR c.id = :categoria)
+            AND (:status IS NULL OR o.status = :status)
             """)
     List<Objeto> buscarDinamico(
             @Param("termo") String termo,
             @Param("data") LocalDate data,
-            @Param("categoria") Integer categoria);
+            @Param("categoria") Integer categoria,
+            @Param("status") StatusObjeto status);
 }

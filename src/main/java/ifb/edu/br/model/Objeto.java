@@ -43,6 +43,10 @@ public class Objeto {
     @Column(name = "geom", columnDefinition = "Geometry(Point,4326)")
     private Point geom;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private StatusObjeto status;
+
     @ManyToMany
     @JoinTable(name = "Objeto_Categoria", joinColumns = @JoinColumn(name = "ID_objeto"), inverseJoinColumns = @JoinColumn(name = "ID_categoria"))
     private List<Categoria> categorias;

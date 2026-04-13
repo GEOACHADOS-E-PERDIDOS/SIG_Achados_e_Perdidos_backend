@@ -4,6 +4,7 @@ import ifb.edu.br.dto.ObjetoRequest;
 import ifb.edu.br.dto.ObjetoResponse;
 import ifb.edu.br.model.Categoria;
 import ifb.edu.br.model.Objeto;
+import ifb.edu.br.model.StatusObjeto;
 import ifb.edu.br.service.MinioService;
 import ifb.edu.br.service.ObjetoService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class ObjetoController {
         objeto.setDescricao(objetoRequest.descricao());
         objeto.setEnderecoEncontro(objetoRequest.enderecoEncontro());
         objeto.setDataEncontro(LocalDate.parse(objetoRequest.dataEncontro()));
+        objeto.setStatus(StatusObjeto.DISPONIVEL);
 
         if (objetoRequest.categorias() != null) {
             objeto.setCategorias(
@@ -123,13 +125,18 @@ public class ObjetoController {
     public ResponseEntity<List<ObjetoResponse>> buscar(
             @RequestParam(required = false) String termo,
             @RequestParam(required = false) String data,
-            @RequestParam(required = false) Integer categoria) {
+            @RequestParam(required = false) Integer categoria,
+            @RequestParam(required = false) StatusObjeto status) {
 
         LocalDate dataConvertida = (data != null && !data.isEmpty())
                 ? LocalDate.parse(data)
                 : null;
 
-        List<Objeto> objetos = objetoService.buscar(termo, dataConvertida, categoria);
+        List<Objeto> objetos = objetoService.buscar(
+                termo,
+                dataConvertida,
+                categoria,
+                status);
 
         return ResponseEntity.ok(
                 objetos.stream().map(this::mapToResponse).toList());
@@ -156,6 +163,8 @@ public class ObjetoController {
                 objeto.getImagemObjeto() != null ? objeto.getImagemObjeto().getCaminhoImagem() : null,
                 geom != null ? geom.getY() : null,
                 geom != null ? geom.getX() : null,
-                objeto.getCategorias() != null ? objeto.getCategorias() : List.of());
+                objeto.getCategorias() != null ? objeto.getCategorias() : List.of(),
+                objeto.getStatus() 
+        );
     }
 }

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import ifb.edu.br.model.Categoria;
+import ifb.edu.br.model.StatusObjeto;
 
 public record ObjetoResponse(
         Integer id,
@@ -14,5 +15,6 @@ public record ObjetoResponse(
         String caminhoImagem,
         Double latitude,
         Double longitude,
-        List<Categoria> categorias
+        List<Categoria> categorias,
+        StatusObjeto status
 ) {}
