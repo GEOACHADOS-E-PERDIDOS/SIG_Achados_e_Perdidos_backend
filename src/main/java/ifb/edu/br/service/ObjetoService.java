@@ -1,5 +1,6 @@
 package ifb.edu.br.service;
 
+import ifb.edu.br.model.Categoria;
 import ifb.edu.br.model.Objeto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -7,11 +8,11 @@ import org.springframework.web.multipart.MultipartFile;
 import ifb.edu.br.repository.CategoriaRepository;
 import ifb.edu.br.repository.ObjetoRepository;
 import lombok.RequiredArgsConstructor;
+import java.util.Optional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Coordinate;
@@ -94,19 +95,12 @@ public class ObjetoService {
         objetoRepository.deleteById(id);
     }
 
-    public List<Objeto> buscarPorNome(String nome) {
-        return objetoRepository.findByNomeContainingIgnoreCase(nome);
-    }
-
-    public List<Objeto> buscarPorData(LocalDate data) {
-        return objetoRepository.findByDataEncontro(data);
+    public List<Objeto> buscar(String termo, LocalDate data, Integer categoria) {
+        return objetoRepository.buscarDinamico(termo, data, categoria);
     }
 
     public List<Objeto> buscarPorPosto(Integer idPosto) {
         return objetoRepository.findByPostoRetirada_Id(idPosto);
     }
 
-    public List<Objeto> buscarPorCategoria(Integer idCategoria) {
-        return objetoRepository.findByCategorias_Id(idCategoria);
-    }
 }

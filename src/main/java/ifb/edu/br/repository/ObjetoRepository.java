@@ -1,6 +1,8 @@
 package ifb.edu.br.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import ifb.edu.br.model.Objeto;
@@ -19,4 +21,18 @@ public interface ObjetoRepository extends JpaRepository<Objeto, Integer> {
 
     List<Objeto> findByCategorias_Id(Integer idCategoria);
 
+    @Query("""
+            SELECT o FROM Objeto o
+            LEFT JOIN o.categorias c
+            WHERE (:termo IS NULL OR
+                   LOWER(o.nome) LIKE LOWER(CONCAT('%', :termo, '%')) OR
+                   LOWER(o.descricao) LIKE LOWER(CONCAT('%', :termo, '%')) OR
+                   LOWER(o.enderecoEncontro) LIKE LOWER(CONCAT('%', :termo, '%')))
+            AND (:data IS NULL OR o.dataEncontro = :data)
+            AND (:categoria IS NULL OR c.id = :categoria)
+            """)
+    List<Objeto> buscarDinamico(
+            @Param("termo") String termo,
+            @Param("data") LocalDate data,
+            @Param("categoria") Integer categoria);
 }

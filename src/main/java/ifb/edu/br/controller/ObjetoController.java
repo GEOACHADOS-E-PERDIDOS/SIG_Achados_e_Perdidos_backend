@@ -119,23 +119,20 @@ public class ObjetoController {
         }
     }
 
-    @GetMapping(value = "/buscar", params = "nome")
-    public ResponseEntity<List<ObjetoResponse>> buscarPorNome(@RequestParam String nome) {
-        List<Objeto> objetos = objetoService.buscarPorNome(nome);
-        List<ObjetoResponse> responses = objetos.stream()
-                .map(this::mapToResponse)
-                .toList();
-        return ResponseEntity.ok(responses);
-    }
+    @GetMapping("/buscar")
+    public ResponseEntity<List<ObjetoResponse>> buscar(
+            @RequestParam(required = false) String termo,
+            @RequestParam(required = false) String data,
+            @RequestParam(required = false) Integer categoria) {
 
-    @GetMapping(value = "/buscar", params = "data")
-    public ResponseEntity<List<ObjetoResponse>> buscarPorData(@RequestParam String data) {
-        LocalDate dataConvertida = LocalDate.parse(data);
-        List<Objeto> objetos = objetoService.buscarPorData(dataConvertida);
-        List<ObjetoResponse> responses = objetos.stream()
-                .map(this::mapToResponse)
-                .toList();
-        return ResponseEntity.ok(responses);
+        LocalDate dataConvertida = (data != null && !data.isEmpty())
+                ? LocalDate.parse(data)
+                : null;
+
+        List<Objeto> objetos = objetoService.buscar(termo, dataConvertida, categoria);
+
+        return ResponseEntity.ok(
+                objetos.stream().map(this::mapToResponse).toList());
     }
 
     @GetMapping("/buscar/posto/{idPosto}")
