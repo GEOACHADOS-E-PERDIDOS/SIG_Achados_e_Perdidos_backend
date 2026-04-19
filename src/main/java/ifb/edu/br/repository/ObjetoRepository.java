@@ -23,15 +23,19 @@ public interface ObjetoRepository extends JpaRepository<Objeto, Integer> {
     List<Objeto> findByCategorias_Id(Integer idCategoria);
 
     @Query("""
-            SELECT o FROM Objeto o
+            SELECT DISTINCT o FROM Objeto o
             LEFT JOIN o.categorias c
-            WHERE (:termo IS NULL OR
-                   LOWER(o.nome) LIKE LOWER(CONCAT('%', :termo, '%')) OR
-                   LOWER(o.descricao) LIKE LOWER(CONCAT('%', :termo, '%')) OR
-                   LOWER(o.enderecoEncontro) LIKE LOWER(CONCAT('%', :termo, '%')))
-            AND (:data IS NULL OR o.dataEncontro = :data)
-            AND (:categoria IS NULL OR c.id = :categoria)
-            AND (:status IS NULL OR o.status = :status)
+            WHERE (
+                :termo = '' OR
+                LOWER(o.nome) LIKE LOWER(CONCAT('%', :termo, '%')) OR
+                LOWER(o.descricao) LIKE LOWER(CONCAT('%', :termo, '%')) OR
+                LOWER(o.enderecoEncontro) LIKE LOWER(CONCAT('%', :termo, '%'))
+            )
+            AND (
+                o.dataEncontro = COALESCE(:data, o.dataEncontro)                        )
+            AND (
+                :categoria = -1 OR c.id = :categoria
+            )
             """)
     List<Objeto> buscarDinamico(
             @Param("termo") String termo,

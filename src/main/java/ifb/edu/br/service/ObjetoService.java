@@ -97,8 +97,11 @@ public class ObjetoService {
         objetoRepository.deleteById(id);
     }
 
-    public List<Objeto> buscar(String termo, LocalDate data, Integer categoria, StatusObjeto status) {
-        return objetoRepository.buscarDinamico(termo, data, categoria, status);
+    public List<Objeto> buscar(String termo, LocalDate data, Integer categoria,StatusObjeto status) {
+        termo = (termo == null || termo.isBlank()) ? "" : termo;
+        categoria = (categoria == null) ? -1 : categoria;
+        return objetoRepository.buscarDinamico(termo, data, categoria,status);
+
     }
 
     public List<Objeto> buscarPorPosto(Integer idPosto) {
