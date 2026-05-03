@@ -3,9 +3,12 @@ package ifb.edu.br.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import ifb.edu.br.model.Categoria;
 import ifb.edu.br.model.StatusObjeto;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ObjetoResponse(
         Integer id,
         String nome,
@@ -13,8 +16,10 @@ public record ObjetoResponse(
         String enderecoEncontro,
         LocalDate dataEncontro,
         String caminhoImagem,
-        Double latitude,
-        Double longitude,
+        Double latitudeEncontro,
+        Double longitudeEncontro,
+        Double latitudeAtual,
+        Double longitudeAtual,
         List<Categoria> categorias,
         StatusObjeto status
 ) {}

@@ -2,13 +2,14 @@ package ifb.edu.br.service;
 
 import ifb.edu.br.model.Categoria;
 import ifb.edu.br.model.Objeto;
+import ifb.edu.br.model.ObjetoPerdido;
 import ifb.edu.br.model.StatusObjeto;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import ifb.edu.br.repository.CategoriaRepository;
-import ifb.edu.br.repository.ObjetoRepository;
+import ifb.edu.br.repository.ObjetoPerdidoRepository;
 import lombok.RequiredArgsConstructor;
 import java.util.Optional;
 
@@ -22,20 +23,20 @@ import org.locationtech.jts.geom.Coordinate;
 @Service
 @RequiredArgsConstructor
 
-public class ObjetoService {
+public class ObjetoPerdidoService {
 
-    private final ObjetoRepository objetoRepository;
+    private final ObjetoPerdidoRepository objetoRepository;
     private final ImagemObjetoService imagemObjetoService;
     private final CategoriaRepository categoriaRepository;
 
-    public Objeto salvarComImagem(Objeto objeto,
+    public ObjetoPerdido salvarComImagem(ObjetoPerdido objeto,
             double latitude,
             double longitude,
             MultipartFile imagem) {
 
         GeometryFactory geometryFactory = new GeometryFactory();
         Point ponto = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-        objeto.setGeom(ponto);
+        objeto.setGeomPerdido(ponto);
 
         if (imagem != null && !imagem.isEmpty()) {
             objeto.setImagemObjeto(
@@ -52,15 +53,15 @@ public class ObjetoService {
         return objetoRepository.save(objeto);
     }
 
-    public List<Objeto> listarTodos() {
+    public List<ObjetoPerdido> listarTodos() {
         return objetoRepository.findAll();
     }
 
-    public Optional<Objeto> buscarPorId(Integer id) {
+    public Optional<ObjetoPerdido> buscarPorId(Integer id) {
         return objetoRepository.findById(id);
     }
 
-    public Objeto atualizar(Integer id, Objeto objetoAtualizado, double latitude, double longitude) {
+    public ObjetoPerdido atualizar(Integer id, ObjetoPerdido objetoAtualizado, double latitude, double longitude) {
         GeometryFactory geometryFactory = new GeometryFactory();
         Point ponto = geometryFactory.createPoint(new Coordinate(longitude, latitude));
 
@@ -68,11 +69,10 @@ public class ObjetoService {
                 .map(objeto -> {
                     objeto.setNome(objetoAtualizado.getNome());
                     objeto.setDescricao(objetoAtualizado.getDescricao());
-                    objeto.setEnderecoEncontro(objetoAtualizado.getEnderecoEncontro());
-                    objeto.setDataEncontro(objetoAtualizado.getDataEncontro());
-                    objeto.setPostoRetirada(objetoAtualizado.getPostoRetirada());
+                    objeto.setEnderecoPerda(objetoAtualizado.getEnderecoPerda());
+                    objeto.setDataPerda(objetoAtualizado.getDataPerda());
                     objeto.setImagemObjeto(objetoAtualizado.getImagemObjeto());
-                    objeto.setGeom(ponto);
+                    objeto.setGeomPerdido(ponto);
 
                     if (objetoAtualizado.getCategorias() != null && !objetoAtualizado.getCategorias().isEmpty()) {
                         objeto.setCategorias(
@@ -97,15 +97,12 @@ public class ObjetoService {
         objetoRepository.deleteById(id);
     }
 
-    public List<Objeto> buscar(String termo, LocalDate data, Integer categoria,StatusObjeto status) {
+    public List<ObjetoPerdido> buscar(String termo, LocalDate data, Integer categoria,StatusObjeto status) {
         termo = (termo == null || termo.isBlank()) ? "" : termo;
         categoria = (categoria == null) ? -1 : categoria;
         return objetoRepository.buscarDinamico(termo, data, categoria,status);
 
     }
 
-    public List<Objeto> buscarPorPosto(Integer idPosto) {
-        return objetoRepository.findByPostoRetirada_Id(idPosto);
-    }
 
 }

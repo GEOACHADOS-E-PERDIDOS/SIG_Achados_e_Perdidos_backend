@@ -2,12 +2,11 @@ package ifb.edu.br.dto;
 
 import java.util.List;
 
-public record ObjetoRequest(
+public record ObjetoPerdidoRequest(
         String nome,
         String descricao,
-        String enderecoEncontro,
-        String dataEncontro,
-        Integer postoRetiradaId,
+        String enderecoPerdido,
+        String dataPerdido,
         Integer imagemObjetoId,
         Double latitude,
         Double longitude,
