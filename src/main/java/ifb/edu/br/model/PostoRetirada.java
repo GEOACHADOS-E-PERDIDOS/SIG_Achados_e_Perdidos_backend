@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Point;
 public class PostoRetirada {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_posto")
     private Integer id;
 

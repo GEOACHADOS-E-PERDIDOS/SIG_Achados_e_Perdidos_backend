@@ -11,10 +11,10 @@ import java.util.List;
 public interface PostoRetiradaRepository extends JpaRepository<PostoRetirada, Integer> {
 
     // Buscar por nome (igual ao padrão do objeto)
-    List<PostoRetirada> findByNomeContainingIgnoreCase(String nome);
-
-    // Buscar por endereço
-    List<PostoRetirada> findByEnderecoContainingIgnoreCase(String endereco);
+    List<PostoRetirada> findByNomeContainingIgnoreCaseOrEnderecoContainingIgnoreCase(
+        String nome,
+        String endereco
+);
 
 
 }

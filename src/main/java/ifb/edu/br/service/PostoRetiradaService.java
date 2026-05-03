@@ -76,13 +76,16 @@ public class PostoRetiradaService {
     }
 
     // 🔍 Buscar por nome
-    public List<PostoRetirada> buscarPorNome(String nome) {
-        return postoRepository.findByNomeContainingIgnoreCase(nome);
+    public List<PostoRetirada> buscarPorTermo(String termo) {
+
+    if (termo == null || termo.isBlank()) {
+        return postoRepository.findAll();
     }
 
-    // 🔍 Buscar por endereço
-    public List<PostoRetirada> buscarPorEndereco(String endereco) {
-        return postoRepository.findByEnderecoContainingIgnoreCase(endereco);
-    }
+    return postoRepository.findByNomeContainingIgnoreCaseOrEnderecoContainingIgnoreCase(
+            termo,
+            termo
+    );
+}
 
 }

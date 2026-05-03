@@ -1,5 +1,8 @@
 package ifb.edu.br.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import ifb.edu.br.dto.PostoRetiradaRequest;
 import ifb.edu.br.dto.PostoRetiradaResponse;
 import ifb.edu.br.model.PostoRetirada;
@@ -14,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5174")
 @RestController
 @RequestMapping("/postos")
 @RequiredArgsConstructor
@@ -26,6 +29,15 @@ public class PostoRetiradaController {
     @PostMapping
     public ResponseEntity<PostoRetiradaResponse> criar(
             @RequestBody PostoRetiradaRequest request) {
+
+
+        // 🔍 TESTE DE AUTENTICAÇÃO (COLOQUE AQUI)
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+    System.out.println("=== DEBUG AUTH ===");
+    System.out.println("USER: " + auth.getName());
+    System.out.println("AUTHORITIES: " + auth.getAuthorities());
+    System.out.println("==================");
 
         PostoRetirada posto = new PostoRetirada();
         posto.setNome(request.nome());
@@ -54,38 +66,19 @@ public class PostoRetiradaController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<List<PostoRetiradaResponse>> listarTodos() {
-        List<PostoRetirada> postos = postoService.listarTodos();
+   @GetMapping
+public ResponseEntity<List<PostoRetiradaResponse>> listar(
+        @RequestParam(required = false) String termo
+) {
 
-        List<PostoRetiradaResponse> responses = postos.stream()
-                .map(this::mapToResponse)
-                .toList();
+    List<PostoRetirada> postos = postoService.buscarPorTermo(termo);
 
-        return ResponseEntity.ok(responses);
-    }
-
-    // 🔍 Buscar por ID
-    @GetMapping("/{id}")
-    public ResponseEntity<PostoRetiradaResponse> buscarPorId(@PathVariable Integer id) {
-        Optional<PostoRetirada> postoOpt = postoService.buscarPorId(id);
-
-        return postoOpt.map(posto -> {
-            Point geom = posto.getGeom();
-
-            PostoRetiradaResponse response = new PostoRetiradaResponse(
-                    posto.getId(),
-                    posto.getNome(),
-                    posto.getEndereco(),
-                    posto.getTelefone(),
-                    posto.getEmail(),
-                    geom != null ? geom.getY() : null,
-                    geom != null ? geom.getX() : null
-            );
-
-            return ResponseEntity.ok(response);
-        }).orElse(ResponseEntity.notFound().build());
-    }
+    return ResponseEntity.ok(
+            postos.stream()
+                    .map(this::mapToResponse)
+                    .toList()
+    );
+}
 
     // ✏️ Atualizar
     @PutMapping("/{id}")
