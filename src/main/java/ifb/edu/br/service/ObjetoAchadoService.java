@@ -33,16 +33,13 @@ public class ObjetoAchadoService {
     public ObjetoAchado salvarComImagem(ObjetoAchado objeto,
             double latitudeAchado,
             double longitudeAchado,
-            double latitudeAtual,
-            double longitudeAtual,
             MultipartFile imagem) {
 
         GeometryFactory geometryFactory = new GeometryFactory();
         Point pontoAchado = geometryFactory.createPoint(new Coordinate(longitudeAchado, latitudeAchado));
-        Point pontoAtual = geometryFactory.createPoint(new Coordinate(longitudeAtual, latitudeAtual));
 
         objeto.setGeomAchado(pontoAchado);
-        objeto.setGeomAtual(pontoAtual);
+
 
         if (imagem != null && !imagem.isEmpty()) {
             objeto.setImagemObjeto(
@@ -70,14 +67,11 @@ public class ObjetoAchadoService {
     public ObjetoAchado atualizar(Integer id,
                             ObjetoAchado objetoAtualizado,
                             double latitudeAchado,
-                            double longitudeAchado,
-                            double latitudeAtual,
-                            double longitudeAtual) {
+                            double longitudeAchado) {
 
         GeometryFactory geometryFactory = new GeometryFactory();
         Point pontoAchado = geometryFactory.createPoint(new Coordinate(longitudeAchado, latitudeAchado));
-        Point pontoAtual = geometryFactory.createPoint(new Coordinate(longitudeAtual, latitudeAtual));
-
+    
         return objetoRepository.findById(id)
                 .map(objeto -> {
                     objeto.setNome(objetoAtualizado.getNome());
@@ -86,7 +80,6 @@ public class ObjetoAchadoService {
                     objeto.setDataEncontro(objetoAtualizado.getDataEncontro());
                     objeto.setImagemObjeto(objetoAtualizado.getImagemObjeto());
                     objeto.setGeomAchado(pontoAchado);
-                    objeto.setGeomAtual(pontoAtual);
 
                     if (objetoAtualizado.getCategorias() != null && !objetoAtualizado.getCategorias().isEmpty()) {
                         objeto.setCategorias(

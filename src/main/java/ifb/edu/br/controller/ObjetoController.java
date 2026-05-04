@@ -11,6 +11,8 @@ import ifb.edu.br.model.StatusObjeto;
 import ifb.edu.br.service.MinioService;
 import ifb.edu.br.service.ObjetoAchadoService;
 import ifb.edu.br.service.ObjetoPerdidoService;
+import ifb.edu.br.model.PostoRetirada;
+import ifb.edu.br.service.PostoRetiradaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,7 @@ public class ObjetoController {
 
     private final ObjetoAchadoService objetoAchadoService;
     private final ObjetoPerdidoService objetoPerdidoService;
+    private final PostoRetiradaService postoRetiradaService;
     private final MinioService minioService;
 
     @PostMapping(value = "/achados", consumes = "multipart/form-data")
@@ -41,6 +44,9 @@ public class ObjetoController {
         objeto.setDescricao(objetoRequest.descricao());
         objeto.setEnderecoEncontro(objetoRequest.enderecoEncontro());
         objeto.setDataEncontro(LocalDate.parse(objetoRequest.dataEncontro()));
+        PostoRetirada posto = postoRetiradaService.buscarPorId(objetoRequest.postoRetiradaId())
+        .orElseThrow(() -> new RuntimeException("Posto não encontrado"));
+        objeto.setPostoRetirada(posto);
         objeto.setStatus(StatusObjeto.DISPONIVEL);
 
         if (objetoRequest.categorias() != null) {
@@ -58,8 +64,6 @@ public class ObjetoController {
                 objeto,
                 objetoRequest.latitudeAchado(),
                 objetoRequest.longitudeAchado(),
-                objetoRequest.latitudeAtual(),
-                objetoRequest.longitudeAtual(),
                 imagem);
 
         return ResponseEntity.ok(mapToResponseAchado(objeto));
@@ -256,9 +260,6 @@ public class ObjetoController {
                 obj.getGeomAchado() != null ? obj.getGeomAchado().getY() : null,
                 obj.getGeomAchado() != null ? obj.getGeomAchado().getX() : null,
 
-                obj.getGeomAtual() != null ? obj.getGeomAtual().getY() : null,
-                obj.getGeomAtual() != null ? obj.getGeomAtual().getX() : null,
-
                 obj.getCategorias(),
                 obj.getStatus());
     }
@@ -277,10 +278,6 @@ public class ObjetoController {
                 // local perda
                 obj.getGeomPerdido() != null ? obj.getGeomPerdido().getY() : null,
                 obj.getGeomPerdido() != null ? obj.getGeomPerdido().getX() : null,
-
-                // NÃO EXISTE para perdido
-                null,
-                null,
 
                 obj.getCategorias(),
                 obj.getStatus());

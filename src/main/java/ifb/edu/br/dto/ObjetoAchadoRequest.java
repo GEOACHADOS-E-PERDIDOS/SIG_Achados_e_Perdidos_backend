@@ -11,7 +11,5 @@ public record ObjetoAchadoRequest(
         Integer imagemObjetoId,
         Double latitudeAchado,
         Double longitudeAchado,
-        Double latitudeAtual,
-        Double longitudeAtual,
         List<Integer> categorias 
 ) {}

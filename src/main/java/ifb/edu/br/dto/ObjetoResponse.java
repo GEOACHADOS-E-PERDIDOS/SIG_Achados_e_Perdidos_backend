@@ -18,8 +18,6 @@ public record ObjetoResponse(
         String caminhoImagem,
         Double latitudeEncontro,
         Double longitudeEncontro,
-        Double latitudeAtual,
-        Double longitudeAtual,
         List<Categoria> categorias,
         StatusObjeto status
 ) {}

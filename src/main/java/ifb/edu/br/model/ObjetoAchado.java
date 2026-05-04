@@ -27,6 +27,4 @@ public class ObjetoAchado extends Objeto {
     @Column(name = "geom_achado", columnDefinition = "Geometry(Point,4326)")
     private Point geomAchado;
 
-    @Column(name = "geom_atual", columnDefinition = "Geometry(Point,4326)")
-    private Point geomAtual;
 }
