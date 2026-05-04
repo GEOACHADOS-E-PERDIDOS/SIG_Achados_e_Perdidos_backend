@@ -86,6 +86,6 @@ public class PostoRetiradaService {
             termo,
             termo
     );
-}
+    }
 
 }

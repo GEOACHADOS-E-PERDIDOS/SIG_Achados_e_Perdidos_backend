@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:5174")
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/postos")
 @RequiredArgsConstructor
@@ -30,15 +30,6 @@ public class PostoRetiradaController {
     public ResponseEntity<PostoRetiradaResponse> criar(
             @RequestBody PostoRetiradaRequest request) {
 
-
-        // 🔍 TESTE DE AUTENTICAÇÃO (COLOQUE AQUI)
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-    System.out.println("=== DEBUG AUTH ===");
-    System.out.println("USER: " + auth.getName());
-    System.out.println("AUTHORITIES: " + auth.getAuthorities());
-    System.out.println("==================");
-
         PostoRetirada posto = new PostoRetirada();
         posto.setNome(request.nome());
         posto.setEndereco(request.endereco());
@@ -48,8 +39,7 @@ public class PostoRetiradaController {
         posto = postoService.salvar(
                 posto,
                 request.latitude(),
-                request.longitude()
-        );
+                request.longitude());
 
         Point geom = posto.getGeom();
 
@@ -60,27 +50,42 @@ public class PostoRetiradaController {
                 posto.getTelefone(),
                 posto.getEmail(),
                 geom != null ? geom.getY() : null,
-                geom != null ? geom.getX() : null
-        );
+                geom != null ? geom.getX() : null);
 
         return ResponseEntity.ok(response);
     }
 
-   @GetMapping
-public ResponseEntity<List<PostoRetiradaResponse>> listar(
-        @RequestParam(required = false) String termo
-) {
+    @GetMapping
+    public ResponseEntity<List<PostoRetiradaResponse>> listar(@RequestParam(required = false) String termo) {
 
     List<PostoRetirada> postos = postoService.buscarPorTermo(termo);
 
     return ResponseEntity.ok(
             postos.stream()
-                    .map(this::mapToResponse)
-                    .toList()
-    );
-}
+                .map(this::mapToResponse)
+                .toList());
+    }
 
-    // ✏️ Atualizar
+    @GetMapping("/{id}")
+    public ResponseEntity<PostoRetiradaResponse> buscarPorId(@PathVariable Integer id) {
+        Optional<PostoRetirada> postoOpt = postoService.buscarPorId(id);
+
+        return postoOpt.map(posto -> {
+            Point geom = posto.getGeom();
+
+            PostoRetiradaResponse response = new PostoRetiradaResponse(
+                    posto.getId(),
+                    posto.getNome(),
+                    posto.getEndereco(),
+                    posto.getTelefone(),
+                    posto.getEmail(),
+                    geom != null ? geom.getY() : null,
+                    geom != null ? geom.getX() : null);
+
+            return ResponseEntity.ok(response);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<PostoRetiradaResponse> atualizar(
             @PathVariable Integer id,
@@ -97,8 +102,7 @@ public ResponseEntity<List<PostoRetiradaResponse>> listar(
                     id,
                     postoAtualizado,
                     request.latitude(),
-                    request.longitude()
-            );
+                    request.longitude());
 
             Point geom = atualizado.getGeom();
 
@@ -109,8 +113,7 @@ public ResponseEntity<List<PostoRetiradaResponse>> listar(
                     atualizado.getTelefone(),
                     atualizado.getEmail(),
                     geom != null ? geom.getY() : null,
-                    geom != null ? geom.getX() : null
-            );
+                    geom != null ? geom.getX() : null);
 
             return ResponseEntity.ok(response);
 
@@ -119,7 +122,6 @@ public ResponseEntity<List<PostoRetiradaResponse>> listar(
         }
     }
 
-    // ❌ Deletar
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         try {
@@ -130,7 +132,6 @@ public ResponseEntity<List<PostoRetiradaResponse>> listar(
         }
     }
 
-    // 🔄 Mapper interno (igual ao ObjetoController)
     private PostoRetiradaResponse mapToResponse(PostoRetirada posto) {
         Point geom = posto.getGeom();
 
@@ -141,7 +142,6 @@ public ResponseEntity<List<PostoRetiradaResponse>> listar(
                 posto.getTelefone(),
                 posto.getEmail(),
                 geom != null ? geom.getY() : null,
-                geom != null ? geom.getX() : null
-        );
+                geom != null ? geom.getX() : null);
     }
 }
