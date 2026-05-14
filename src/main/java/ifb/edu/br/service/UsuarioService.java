@@ -60,6 +60,17 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 
+    public Usuario tornarAdmin(Integer id) {
+
+    Usuario usuario = userRepository.findById(id)
+            .orElseThrow(() ->
+                    new RuntimeException("Usuário não encontrado"));
+
+    usuario.setIsAdmin(true);
+
+    return userRepository.save(usuario);
+    }
+
     public void deletarUsuario(Integer id) {
         userRepository.deleteById(id);
     }

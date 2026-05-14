@@ -70,6 +70,18 @@ public class UsuarioController {
         return userService.atualizarUsuario(id, user);
     }
 
+    @PutMapping("/{id}/tornar-admin")
+    public ResponseEntity<String> tornarAdmin(
+        @PathVariable Integer id
+    ) {
+
+    userService.tornarAdmin(id);
+
+        return ResponseEntity.ok(
+            "Usuário promovido para admin com sucesso!"
+        );
+    }   
+
     @DeleteMapping("/{id}")
     public void deletarUsuario(@PathVariable Integer id) {
         userService.deletarUsuario(id);
