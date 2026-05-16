@@ -5,9 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import ifb.edu.br.model.Objeto;
 import ifb.edu.br.model.ObjetoAchado;
-import ifb.edu.br.model.ObjetoPerdido;
 import ifb.edu.br.model.StatusObjeto;
 
 import java.time.LocalDate;
@@ -22,7 +20,7 @@ public interface ObjetoAchadoRepository extends JpaRepository<ObjetoAchado, Inte
 
     List<ObjetoAchado> findByPostoRetirada_Id(Integer idPosto);
 
-    List<ObjetoPerdido> findByCategorias_Id(Integer idCategoria);
+    List<ObjetoAchado> findByCategorias_Id(Integer idCategoria);
 
     @Query("""
                 SELECT DISTINCT oa FROM ObjetoAchado oa

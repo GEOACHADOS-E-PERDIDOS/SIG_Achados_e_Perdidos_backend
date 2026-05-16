@@ -10,14 +10,16 @@ import ifb.edu.br.model.StatusObjeto;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ObjetoResponse(
+
         Integer id,
         String nome,
         String descricao,
         String enderecoEncontro,
         LocalDate dataEncontro,
-        String caminhoImagem,
+        List<String> caminhosImagens,
         Double latitudeEncontro,
         Double longitudeEncontro,
         List<Categoria> categorias,
         StatusObjeto status
+
 ) {}

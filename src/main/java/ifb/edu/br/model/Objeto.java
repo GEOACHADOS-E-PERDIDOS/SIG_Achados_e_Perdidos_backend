@@ -1,9 +1,10 @@
 package ifb.edu.br.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.List;
 
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -25,10 +26,6 @@ public class Objeto {
     @Column(name = "descricao", length = 50)
     private String descricao;
 
-    @ManyToOne
-    @JoinColumn(name = "Imagem_objeto_ID_imagem")
-    private ImagemObjeto imagemObjeto;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private StatusObjeto status;
@@ -40,4 +37,13 @@ public class Objeto {
         inverseJoinColumns = @JoinColumn(name = "ID_categoria")
     )
     private List<Categoria> categorias;
+
+    @OneToMany(
+        mappedBy = "objeto",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.EAGER
+    )
+    @JsonManagedReference
+    private List<ImagemObjeto> imagens;
 }
