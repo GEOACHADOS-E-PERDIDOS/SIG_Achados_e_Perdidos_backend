@@ -192,4 +192,9 @@ public class ObjetoPerdidoService {
                 categoria,
                 status);
     }
+
+    public List<ObjetoPerdido> buscarParaMapa(String nome) {
+        return objetoRepository.buscarParaMapa(nome);
+    }
+
 }

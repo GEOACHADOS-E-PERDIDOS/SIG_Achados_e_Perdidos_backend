@@ -45,4 +45,10 @@ public interface ObjetoPerdidoRepository extends JpaRepository<ObjetoPerdido, In
             @Param("data") LocalDate data,
             @Param("categoria") Integer categoria,
             @Param("status") StatusObjeto status);
+
+    @Query("""
+                SELECT op FROM ObjetoPerdido op
+                WHERE LOWER(op.nome) LIKE LOWER(CONCAT('%', :nome, '%'))
+            """)
+            List<ObjetoPerdido> buscarParaMapa(@Param("nome") String nome);
 }

@@ -196,4 +196,9 @@ public class ObjetoAchadoService {
     public List<ObjetoAchado> buscarPorPosto(Integer idPosto) {
         return objetoRepository.findByPostoRetirada_Id(idPosto);
     }
+
+    public List<ObjetoAchado> buscarParaMapa(String nome) {
+        return objetoRepository.buscarParaMapa(nome);
+    }
+
 }

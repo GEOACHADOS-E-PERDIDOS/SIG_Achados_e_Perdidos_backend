@@ -46,4 +46,10 @@ public interface ObjetoAchadoRepository extends JpaRepository<ObjetoAchado, Inte
             @Param("data") LocalDate data,
             @Param("categoria") Integer categoria,
             @Param("status") StatusObjeto status);
+
+    @Query("""
+                SELECT oa FROM ObjetoAchado oa
+                WHERE LOWER(oa.nome) LIKE LOWER(CONCAT('%', :nome, '%'))
+            """)
+            List<ObjetoAchado> buscarParaMapa(@Param("nome") String nome);
 }

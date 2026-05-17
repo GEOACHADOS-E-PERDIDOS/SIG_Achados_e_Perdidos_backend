@@ -404,9 +404,33 @@ public class ObjetoController {
         return ResponseEntity.ok(resposta);
     }
 
-    /* ===================================================== */
-    /* BUSCAR POR POSTO */
-    /* ===================================================== */
+    @GetMapping("/mapa/buscar")
+        public ResponseEntity<List<ObjetoResponse>> buscarParaMapa(
+                @RequestParam String nome
+        ) {
+
+            List<ObjetoAchado> achados =
+                    objetoAchadoService.buscarParaMapa(nome);
+
+            List<ObjetoPerdido> perdidos =
+                    objetoPerdidoService.buscarParaMapa(nome);
+
+            List<ObjetoResponse> resposta = new ArrayList<>();
+
+            resposta.addAll(
+                    achados.stream()
+                            .map(this::mapToResponseAchado)
+                            .toList()
+            );
+
+            resposta.addAll(
+                    perdidos.stream()
+                            .map(this::mapToResponsePerdido)
+                            .toList()
+            );
+
+            return ResponseEntity.ok(resposta);
+        }
 
     @GetMapping("achados/buscar/posto/{idPosto}")
     public ResponseEntity<List<ObjetoResponse>> buscarPorPosto(
