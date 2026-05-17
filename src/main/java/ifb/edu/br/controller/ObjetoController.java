@@ -135,7 +135,7 @@ public class ObjetoController {
         objeto.setDataPerda(
                 LocalDate.parse(objetoRequest.dataPerdido()));
 
-        objeto.setStatus(StatusObjeto.DISPONIVEL);
+        objeto.setStatus(StatusObjeto.PERDIDO);
 
         if (objetoRequest.categorias() != null) {
 
