@@ -31,15 +31,9 @@ public interface ObjetoAchadoRepository extends JpaRepository<ObjetoAchado, Inte
                     LOWER(oa.descricao) LIKE LOWER(CONCAT('%', :termo, '%')) OR
                     LOWER(oa.enderecoEncontro) LIKE LOWER(CONCAT('%', :termo, '%'))
                 )
-                AND (
-                    :data IS NULL OR oa.dataEncontro = :data
-                )
-                AND (
-                    :categoria = -1 OR c.id = :categoria
-                )
-                AND (
-                    :status IS NULL OR oa.status = :status
-                )
+                AND oa.dataEncontro = COALESCE(:data, oa.dataEncontro)
+                AND c.id = COALESCE(:categoria, c.id)
+                AND oa.status = COALESCE(:status, oa.status)
             """)
     List<ObjetoAchado> buscarDinamico(
             @Param("termo") String termo,
@@ -51,5 +45,5 @@ public interface ObjetoAchadoRepository extends JpaRepository<ObjetoAchado, Inte
                 SELECT oa FROM ObjetoAchado oa
                 WHERE LOWER(oa.nome) LIKE LOWER(CONCAT('%', :nome, '%'))
             """)
-            List<ObjetoAchado> buscarParaMapa(@Param("nome") String nome);
+    List<ObjetoAchado> buscarParaMapa(@Param("nome") String nome);
 }

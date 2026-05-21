@@ -29,7 +29,7 @@ public class UsuarioController {
         user.setDataCadastro(LocalDate.now());
         user.setIsAdmin(false);
         user.setSenhaTemporaria(false);
-        userService.criarUsuario(user); 
+        userService.criarUsuario(user);
 
         return ResponseEntity.ok("Usuário registrado com sucesso!");
     }
@@ -72,18 +72,56 @@ public class UsuarioController {
 
     @PutMapping("/{id}/tornar-admin")
     public ResponseEntity<String> tornarAdmin(
-        @PathVariable Integer id
-    ) {
+            @PathVariable Integer id) {
 
-    userService.tornarAdmin(id);
+        userService.tornarAdmin(id);
 
         return ResponseEntity.ok(
-            "Usuário promovido para admin com sucesso!"
-        );
-    }   
+                "Usuário promovido para admin com sucesso!");
+    }
 
     @DeleteMapping("/{id}")
     public void deletarUsuario(@PathVariable Integer id) {
         userService.deletarUsuario(id);
+    }
+
+    @PutMapping("/{id}/resetar-senha")
+    public ResponseEntity<String> resetarSenha(
+            @PathVariable Integer id) {
+
+        Optional<Usuario> usuarioOpt = userService.buscarPorId(id);
+
+        if (usuarioOpt.isEmpty()) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body("Usuário não encontrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        String senhaTemp = gerarSenhaTemporaria();
+
+        usuario.setSenhaHash(senhaTemp);
+
+        usuario.setSenhaTemporaria(true);
+
+        userService.atualizarUsuario(
+                usuario.getId(),
+                usuario);
+
+        return ResponseEntity.ok(
+                "Senha temporária: " + senhaTemp);
+    }
+
+    private String gerarSenhaTemporaria() {
+        int tamanho = 8;
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < tamanho; i++) {
+            int idx = (int) (Math.random() * chars.length());
+            sb.append(chars.charAt(idx));
+        }
+        return sb.toString();
     }
 }

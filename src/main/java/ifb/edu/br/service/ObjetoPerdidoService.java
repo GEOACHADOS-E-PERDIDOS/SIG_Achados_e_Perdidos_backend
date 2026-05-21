@@ -182,10 +182,6 @@ public class ObjetoPerdidoService {
                 ? ""
                 : termo;
 
-        categoria = (categoria == null)
-                ? -1
-                : categoria;
-
         return objetoRepository.buscarDinamico(
                 termo,
                 data,

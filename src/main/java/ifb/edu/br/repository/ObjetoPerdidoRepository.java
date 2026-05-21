@@ -30,15 +30,9 @@ public interface ObjetoPerdidoRepository extends JpaRepository<ObjetoPerdido, In
                     LOWER(op.descricao) LIKE LOWER(CONCAT('%', :termo, '%')) OR
                     LOWER(op.enderecoPerda) LIKE LOWER(CONCAT('%', :termo, '%'))
                 )
-                AND (
-                    :data IS NULL OR op.dataPerda = :data
-                )
-                AND (
-                    :categoria = -1 OR c.id = :categoria
-                )
-                AND (
-                    :status IS NULL OR op.status = :status
-                )
+                AND op.dataPerda = COALESCE(:data, op.dataPerda)
+                AND c.id = COALESCE(:categoria, c.id)
+                AND op.status = COALESCE(:status, op.status)
             """)
     List<ObjetoPerdido> buscarDinamico(
             @Param("termo") String termo,
@@ -50,5 +44,5 @@ public interface ObjetoPerdidoRepository extends JpaRepository<ObjetoPerdido, In
                 SELECT op FROM ObjetoPerdido op
                 WHERE LOWER(op.nome) LIKE LOWER(CONCAT('%', :nome, '%'))
             """)
-            List<ObjetoPerdido> buscarParaMapa(@Param("nome") String nome);
+    List<ObjetoPerdido> buscarParaMapa(@Param("nome") String nome);
 }
