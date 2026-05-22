@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -27,35 +28,51 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
-    private final UsuarioDetailsServiceImpl userDetailsService;
     private final TokenService tokenService;
     private final UsuarioService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Map<String, Object>> login(
+            @RequestBody LoginRequest loginRequest) {
+
         try {
             var authToken = new UsernamePasswordAuthenticationToken(
                     loginRequest.email(),
                     loginRequest.senha());
-            authenticationManager.authenticate(authToken);
 
-            UsuarioLogin loginUser = (UsuarioLogin) userDetailsService.loadUserByUsername(loginRequest.email());
+            var auth = authenticationManager.authenticate(authToken);
+
+            UsuarioLogin loginUser = (UsuarioLogin) auth.getPrincipal();
             Usuario user = loginUser.getUser();
-
             String token = tokenService.gerarToken(
                     user.getEmail(),
-                    Map.of("name", user.getName(), "isAdmin", user.getIsAdmin()));
+                    Map.of(
+                            "name", user.getName(),
+                            "isAdmin", user.getIsAdmin()));
 
             Map<String, Object> resposta = new HashMap<>();
-            resposta.put("mensagem", "Login realizado com sucesso!");
-            resposta.put("usuario", user.getName());
-            resposta.put("token", token);
-            resposta.put("isTemp", user.getSenhaTemporaria());
+            resposta.put("mensagem","Login realizado com sucesso!");
+
+            resposta.put(
+                    "usuario",
+                    user.getName());
+
+            resposta.put(
+                    "token",
+                    token);
+
+            resposta.put(
+                    "isTemp",
+                    user.getSenhaTemporaria());
 
             return ResponseEntity.ok(resposta);
 
         } catch (AuthenticationException ex) {
-            return ResponseEntity.status(401).body(Map.of("erro", "Usuário ou senha inválidos"));
+
+            return ResponseEntity
+                    .status(401)
+                    .body(Map.of("erro","Usuário ou senha inválidos"));
         }
     }
 
@@ -69,46 +86,70 @@ public class AuthenticationController {
         user.setDataCadastro(LocalDate.now());
         user.setIsAdmin(false);
         user.setSenhaTemporaria(false);
+        user.setSenhaHash(passwordEncoder.encode(user.getSenhaHash()));
         userService.criarUsuario(user);
 
         return ResponseEntity.ok("Usuário registrado com sucesso!");
     }
 
     @PostMapping("/recuperar-senha")
-    public ResponseEntity<String> recuperarSenha(@RequestParam String email) {
+    public ResponseEntity<String> recuperarSenha(
+            @RequestParam String email) {
+
         var usuarioOpt = userService.buscarPorEmail(email);
         if (usuarioOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Email não cadastrado");
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(
+                            "Email não cadastrado");
         }
-
         Usuario usuario = usuarioOpt.get();
-
         String senhaTemp = gerarSenhaTemporaria();
-        usuario.setSenhaHash(senhaTemp);
+        usuario.setSenhaHash(passwordEncoder.encode(senhaTemp));
+
         usuario.setSenhaTemporaria(true);
+
         userService.atualizarUsuario(usuario.getId(), usuario);
-        return ResponseEntity.ok("Senha temporária: " + senhaTemp);
+        return ResponseEntity.ok(
+                "Senha temporária: "
+                        + senhaTemp);
     }
 
     @PostMapping("/trocar-senha")
-    public ResponseEntity<String> trocarSenha(@RequestBody NovaSenhaRequest request,
+    public ResponseEntity<String> trocarSenha(
+            @RequestBody NovaSenhaRequest request,
             @AuthenticationPrincipal UsuarioLogin usuarioLogado) {
 
         Usuario usuario = usuarioLogado.getUser();
 
-        usuario.setSenhaHash(request.novaSenha());
-        usuario.setSenhaTemporaria(false);
-        userService.atualizarUsuario(usuario.getId(), usuario);
+        usuario.setSenhaHash(
 
-        return ResponseEntity.ok("Senha atualizada com sucesso!");
+                passwordEncoder.encode(
+                        request.novaSenha())
+
+        );
+
+        usuario.setSenhaTemporaria(
+                false);
+
+        userService.atualizarUsuario(
+                usuario.getId(),
+                usuario);
+
+        return ResponseEntity.ok(
+                "Senha atualizada com sucesso!");
     }
+
     @GetMapping("/admin/check")
     public ResponseEntity<Boolean> checkAdmin(@AuthenticationPrincipal UsuarioLogin usuarioLogado) {
-        if (usuarioLogado == null) return ResponseEntity.status(401).body(false);
+        if (usuarioLogado == null)
+            return ResponseEntity.status(401).body(false);
 
         Usuario user = usuarioLogado.getUser();
         return ResponseEntity.ok(user.getIsAdmin());
     }
+
     private String gerarSenhaTemporaria() {
         int tamanho = 8;
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

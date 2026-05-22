@@ -46,4 +46,11 @@ public interface ObjetoAchadoRepository extends JpaRepository<ObjetoAchado, Inte
                 WHERE LOWER(oa.nome) LIKE LOWER(CONCAT('%', :nome, '%'))
             """)
     List<ObjetoAchado> buscarParaMapa(@Param("nome") String nome);
+
+        @Query("""
+        SELECT COUNT(o)
+        FROM ObjetoAchado o
+        WHERE o.postoRetirada.id = :postoId
+    """)
+    long contarObjetosPorPosto(Integer postoId);
 }

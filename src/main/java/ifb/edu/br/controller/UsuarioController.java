@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/usuario")
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class UsuarioController {
 
     private final UsuarioService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping
     public ResponseEntity<String> criarUsuario(@RequestBody Usuario user) {
@@ -88,30 +91,28 @@ public class UsuarioController {
     @PutMapping("/{id}/resetar-senha")
     public ResponseEntity<String> resetarSenha(
             @PathVariable Integer id) {
-
         Optional<Usuario> usuarioOpt = userService.buscarPorId(id);
 
         if (usuarioOpt.isEmpty()) {
 
             return ResponseEntity
                     .badRequest()
-                    .body("Usuário não encontrado");
+                    .body(
+                            "Usuário não encontrado");
         }
-
         Usuario usuario = usuarioOpt.get();
-
         String senhaTemp = gerarSenhaTemporaria();
-
-        usuario.setSenhaHash(senhaTemp);
-
-        usuario.setSenhaTemporaria(true);
-
+        usuario.setSenhaHash(
+                passwordEncoder.encode(
+                        senhaTemp));
+        usuario.setSenhaTemporaria(
+                true);
         userService.atualizarUsuario(
                 usuario.getId(),
                 usuario);
-
         return ResponseEntity.ok(
-                "Senha temporária: " + senhaTemp);
+                "Senha temporária: "
+                        + senhaTemp);
     }
 
     private String gerarSenhaTemporaria() {

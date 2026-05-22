@@ -39,17 +39,12 @@ public class ObjetoController {
     /* CRIAR OBJETO ACHADO */
     /* ===================================================== */
 
-    @PostMapping(
-            value = "/achados",
-            consumes = "multipart/form-data")
+    @PostMapping(value = "/achados", consumes = "multipart/form-data")
     public ResponseEntity<ObjetoResponse> criarAchado(
 
             @ModelAttribute ObjetoAchadoRequest objetoRequest,
 
-            @RequestParam(
-                    value = "imagens",
-                    required = false)
-            List<MultipartFile> imagens) {
+            @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens) {
 
         ObjetoAchado objeto = new ObjetoAchado();
 
@@ -63,13 +58,11 @@ public class ObjetoController {
         objeto.setDataEncontro(
                 LocalDate.parse(objetoRequest.dataEncontro()));
 
-        PostoRetirada posto =
-                postoRetiradaService
-                        .buscarPorId(objetoRequest.postoRetiradaId())
+        PostoRetirada posto = postoRetiradaService
+                .buscarPorId(objetoRequest.postoRetiradaId())
 
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Posto não encontrado"));
+                .orElseThrow(() -> new RuntimeException(
+                        "Posto não encontrado"));
 
         objeto.setPostoRetirada(posto);
 
@@ -111,17 +104,12 @@ public class ObjetoController {
     /* CRIAR OBJETO PERDIDO */
     /* ===================================================== */
 
-    @PostMapping(
-            value = "/perdidos",
-            consumes = "multipart/form-data")
+    @PostMapping(value = "/perdidos", consumes = "multipart/form-data")
     public ResponseEntity<ObjetoResponse> criarPerdido(
 
             @ModelAttribute ObjetoPerdidoRequest objetoRequest,
 
-            @RequestParam(
-                    value = "imagens",
-                    required = false)
-            List<MultipartFile> imagens) {
+            @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens) {
 
         ObjetoPerdido objeto = new ObjetoPerdido();
 
@@ -176,23 +164,21 @@ public class ObjetoController {
     @GetMapping
     public List<ObjetoResponse> listarTodos() {
 
-        List<ObjetoResponse> achados =
-                objetoAchadoService.listarTodos()
+        List<ObjetoResponse> achados = objetoAchadoService.listarTodos()
 
-                        .stream()
+                .stream()
 
-                        .map(this::mapToResponseAchado)
+                .map(this::mapToResponseAchado)
 
-                        .toList();
+                .toList();
 
-        List<ObjetoResponse> perdidos =
-                objetoPerdidoService.listarTodos()
+        List<ObjetoResponse> perdidos = objetoPerdidoService.listarTodos()
 
-                        .stream()
+                .stream()
 
-                        .map(this::mapToResponsePerdido)
+                .map(this::mapToResponsePerdido)
 
-                        .toList();
+                .toList();
 
         List<ObjetoResponse> todos = new ArrayList<>();
 
@@ -229,8 +215,7 @@ public class ObjetoController {
     public ResponseEntity<ObjetoResponse> buscarPorId(
             @PathVariable Integer id) {
 
-        Optional<ObjetoAchado> achado =
-                objetoAchadoService.buscarPorId(id);
+        Optional<ObjetoAchado> achado = objetoAchadoService.buscarPorId(id);
 
         if (achado.isPresent()) {
 
@@ -238,8 +223,7 @@ public class ObjetoController {
                     mapToResponseAchado(achado.get()));
         }
 
-        Optional<ObjetoPerdido> perdido =
-                objetoPerdidoService.buscarPorId(id);
+        Optional<ObjetoPerdido> perdido = objetoPerdidoService.buscarPorId(id);
 
         if (perdido.isPresent()) {
 
@@ -263,8 +247,7 @@ public class ObjetoController {
 
         try {
 
-            ObjetoPerdido objetoAtualizado =
-                    new ObjetoPerdido();
+            ObjetoPerdido objetoAtualizado = new ObjetoPerdido();
 
             objetoAtualizado.setNome(
                     objetoRequest.nome());
@@ -297,16 +280,15 @@ public class ObjetoController {
                                 .toList());
             }
 
-            ObjetoPerdido atualizado =
-                    objetoPerdidoService.atualizar(
+            ObjetoPerdido atualizado = objetoPerdidoService.atualizar(
 
-                            id,
+                    id,
 
-                            objetoAtualizado,
+                    objetoAtualizado,
 
-                            objetoRequest.latitude(),
+                    objetoRequest.latitude(),
 
-                            objetoRequest.longitude());
+                    objetoRequest.longitude());
 
             return ResponseEntity.ok(
                     mapToResponsePerdido(atualizado));
@@ -349,41 +331,33 @@ public class ObjetoController {
     @GetMapping("/buscar")
     public ResponseEntity<List<ObjetoResponse>> buscar(
 
-            @RequestParam(required = false)
-            String termo,
+            @RequestParam(required = false) String termo,
 
-            @RequestParam(required = false)
-            String data,
+            @RequestParam(required = false) String data,
 
-            @RequestParam(required = false)
-            Integer categoria,
+            @RequestParam(required = false) Integer categoria,
 
-            @RequestParam(required = false)
-            StatusObjeto status) {
+            @RequestParam(required = false) StatusObjeto status) {
 
-        LocalDate dataConvertida =
-                (data != null && !data.isEmpty())
+        LocalDate dataConvertida = (data != null && !data.isEmpty())
 
-                        ? LocalDate.parse(data)
+                ? LocalDate.parse(data)
 
-                        : null;
+                : null;
 
-        List<ObjetoAchado> achados =
-                objetoAchadoService.buscar(
-                        termo,
-                        dataConvertida,
-                        categoria,
-                        status);
+        List<ObjetoAchado> achados = objetoAchadoService.buscar(
+                termo,
+                dataConvertida,
+                categoria,
+                status);
 
-        List<ObjetoPerdido> perdidos =
-                objetoPerdidoService.buscar(
-                        termo,
-                        dataConvertida,
-                        categoria,
-                        status);
+        List<ObjetoPerdido> perdidos = objetoPerdidoService.buscar(
+                termo,
+                dataConvertida,
+                categoria,
+                status);
 
-        List<ObjetoResponse> resposta =
-                new ArrayList<>();
+        List<ObjetoResponse> resposta = new ArrayList<>();
 
         resposta.addAll(
 
@@ -405,46 +379,39 @@ public class ObjetoController {
     }
 
     @GetMapping("/mapa/buscar")
-        public ResponseEntity<List<ObjetoResponse>> buscarParaMapa(
-                @RequestParam String nome
-        ) {
+    public ResponseEntity<List<ObjetoResponse>> buscarParaMapa(
+            @RequestParam String nome) {
 
-            List<ObjetoAchado> achados =
-                    objetoAchadoService.buscarParaMapa(nome);
+        List<ObjetoAchado> achados = objetoAchadoService.buscarParaMapa(nome);
 
-            List<ObjetoPerdido> perdidos =
-                    objetoPerdidoService.buscarParaMapa(nome);
+        List<ObjetoPerdido> perdidos = objetoPerdidoService.buscarParaMapa(nome);
 
-            List<ObjetoResponse> resposta = new ArrayList<>();
+        List<ObjetoResponse> resposta = new ArrayList<>();
 
-            resposta.addAll(
-                    achados.stream()
-                            .map(this::mapToResponseAchado)
-                            .toList()
-            );
+        resposta.addAll(
+                achados.stream()
+                        .map(this::mapToResponseAchado)
+                        .toList());
 
-            resposta.addAll(
-                    perdidos.stream()
-                            .map(this::mapToResponsePerdido)
-                            .toList()
-            );
+        resposta.addAll(
+                perdidos.stream()
+                        .map(this::mapToResponsePerdido)
+                        .toList());
 
-            return ResponseEntity.ok(resposta);
-        }
+        return ResponseEntity.ok(resposta);
+    }
 
     @GetMapping("achados/buscar/posto/{idPosto}")
     public ResponseEntity<List<ObjetoResponse>> buscarPorPosto(
             @PathVariable Integer idPosto) {
 
-        List<ObjetoAchado> achados =
-                objetoAchadoService.buscarPorPosto(idPosto);
+        List<ObjetoAchado> achados = objetoAchadoService.buscarPorPosto(idPosto);
 
-        List<ObjetoResponse> responses =
-                achados.stream()
+        List<ObjetoResponse> responses = achados.stream()
 
-                        .map(this::mapToResponseAchado)
+                .map(this::mapToResponseAchado)
 
-                        .toList();
+                .toList();
 
         return ResponseEntity.ok(responses);
     }
@@ -453,79 +420,88 @@ public class ObjetoController {
     /* MAP RESPONSE ACHADO */
     /* ===================================================== */
 
-private ObjetoResponse mapToResponseAchado(
-        ObjetoAchado obj) {
+    private ObjetoResponse mapToResponseAchado(
+            ObjetoAchado obj) {
 
-    return new ObjetoResponse(
+        return new ObjetoResponse(
 
-            obj.getId(),
+                obj.getId(),
 
-            obj.getNome(),
+                obj.getNome(),
 
-            obj.getDescricao(),
+                obj.getDescricao(),
 
-            obj.getEnderecoEncontro(),
+                obj.getEnderecoEncontro(),
 
-            obj.getDataEncontro(),
+                obj.getDataEncontro(),
 
-            obj.getImagens() != null
-                    ? obj.getImagens()
-                            .stream()
-                            .map(img -> img.getCaminhoImagem())
-                            .toList()
-                    : List.of(),
+                obj.getImagens() != null
+                        ? obj.getImagens()
+                                .stream()
+                                .map(img -> img.getCaminhoImagem())
+                                .toList()
+                        : List.of(),
 
-            obj.getGeomAchado() != null
-                    ? obj.getGeomAchado().getY()
-                    : null,
+                obj.getGeomAchado() != null
+                        ? obj.getGeomAchado().getY()
+                        : null,
 
-            obj.getGeomAchado() != null
-                    ? obj.getGeomAchado().getX()
-                    : null,
+                obj.getGeomAchado() != null
+                        ? obj.getGeomAchado().getX()
+                        : null,
 
-            obj.getCategorias(),
+                obj.getCategorias(),
 
-            obj.getStatus()
-    );
-}
+                obj.getStatus());
+    }
 
     /* ===================================================== */
     /* MAP RESPONSE PERDIDO */
     /* ===================================================== */
 
- private ObjetoResponse mapToResponsePerdido(
-        ObjetoPerdido obj) {
+    private ObjetoResponse mapToResponsePerdido(
+            ObjetoPerdido obj) {
 
-    return new ObjetoResponse(
+        return new ObjetoResponse(
 
-            obj.getId(),
+                obj.getId(),
 
-            obj.getNome(),
+                obj.getNome(),
 
-            obj.getDescricao(),
+                obj.getDescricao(),
 
-            obj.getEnderecoPerda(),
+                obj.getEnderecoPerda(),
 
-            obj.getDataPerda(),
+                obj.getDataPerda(),
 
-            obj.getImagens() != null
-                    ? obj.getImagens()
-                            .stream()
-                            .map(img -> img.getCaminhoImagem())
-                            .toList()
-                    : List.of(),
+                obj.getImagens() != null
+                        ? obj.getImagens()
+                                .stream()
+                                .map(img -> img.getCaminhoImagem())
+                                .toList()
+                        : List.of(),
 
-            obj.getGeomPerdido() != null
-                    ? obj.getGeomPerdido().getY()
-                    : null,
+                obj.getGeomPerdido() != null
+                        ? obj.getGeomPerdido().getY()
+                        : null,
 
-            obj.getGeomPerdido() != null
-                    ? obj.getGeomPerdido().getX()
-                    : null,
+                obj.getGeomPerdido() != null
+                        ? obj.getGeomPerdido().getX()
+                        : null,
 
-            obj.getCategorias(),
+                obj.getCategorias(),
 
-            obj.getStatus()
-    );
-}
+                obj.getStatus());
+    }
+
+    @GetMapping("/achados/posto/{postoId}/quantidade")
+    public ResponseEntity<Long> contarObjetos(
+            @PathVariable Integer postoId) {
+
+        long quantidade = objetoAchadoService.contarObjetosPosto(
+                postoId);
+
+        return ResponseEntity.ok(
+                quantidade);
+    }
 }

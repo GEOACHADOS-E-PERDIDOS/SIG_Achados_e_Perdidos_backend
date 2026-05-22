@@ -24,8 +24,8 @@ public class Usuario {
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
 
-//    @JsonIgnore - Implementar isso depois 
-    @Column(name = "senha_hash", length = 50, nullable = false)
+
+    @Column(name = "senha_hash", length = 200, nullable = false)
     private String senhaHash;
 
     @Column(name = "data_cadastro")

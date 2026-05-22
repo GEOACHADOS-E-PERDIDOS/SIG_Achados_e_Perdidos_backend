@@ -54,8 +54,7 @@ public class ObjetoAchadoService {
 
                     .map(img -> {
 
-                        String nomeArquivo =
-                                imagemObjetoService.salvarImagemArquivo(img);
+                        String nomeArquivo = imagemObjetoService.salvarImagemArquivo(img);
 
                         return ImagemObjeto.builder()
                                 .caminhoImagem(nomeArquivo)
@@ -141,10 +140,9 @@ public class ObjetoAchadoService {
                                         .map(cat -> categoriaRepository
                                                 .findById(cat.getId())
 
-                                                .orElseThrow(() ->
-                                                        new RuntimeException(
-                                                                "Categoria não encontrada: "
-                                                                        + cat.getId())))
+                                                .orElseThrow(() -> new RuntimeException(
+                                                        "Categoria não encontrada: "
+                                                                + cat.getId())))
 
                                         .toList());
 
@@ -156,9 +154,8 @@ public class ObjetoAchadoService {
                     return objetoRepository.save(objeto);
                 })
 
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Objeto não encontrado com ID: " + id));
+                .orElseThrow(() -> new RuntimeException(
+                        "Objeto não encontrado com ID: " + id));
     }
 
     public void deletar(Integer id) {
@@ -197,4 +194,9 @@ public class ObjetoAchadoService {
         return objetoRepository.buscarParaMapa(nome);
     }
 
+    public long contarObjetosPosto(
+            Integer postoId) {
+        return objetoRepository
+                .contarObjetosPorPosto(postoId);
+    }
 }

@@ -1,8 +1,4 @@
 package ifb.edu.br.controller;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import ifb.edu.br.dto.PostoRetiradaRequest;
 import ifb.edu.br.dto.PostoRetiradaResponse;
 import ifb.edu.br.model.PostoRetirada;
