@@ -6,6 +6,7 @@ import ifb.edu.br.service.PostoRetiradaService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.web.multipart.MultipartFile;
 import org.locationtech.jts.geom.Point;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +23,12 @@ public class PostoRetiradaController {
     private final PostoRetiradaService postoService;
 
     // ➕ Criar posto
-    @PostMapping
+    @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<PostoRetiradaResponse> criar(
-            @RequestBody PostoRetiradaRequest request) {
+
+            @ModelAttribute PostoRetiradaRequest request,
+
+            @RequestParam(value = "imagens",required = false)List<MultipartFile> imagens) {
 
         PostoRetirada posto = new PostoRetirada();
         posto.setNome(request.nome());
@@ -32,10 +36,15 @@ public class PostoRetiradaController {
         posto.setTelefone(request.telefone());
         posto.setEmail(request.email());
 
-        posto = postoService.salvar(
+        posto = postoService.salvarComImagem(
+
                 posto,
+
                 request.latitude(),
-                request.longitude());
+                request.longitude(),
+
+                imagens
+        );
 
         Point geom = posto.getGeom();
 
@@ -46,7 +55,13 @@ public class PostoRetiradaController {
                 posto.getTelefone(),
                 posto.getEmail(),
                 geom != null ? geom.getY() : null,
-                geom != null ? geom.getX() : null);
+                geom != null ? geom.getX() : null,
+                posto.getImagens() != null
+                    ? posto.getImagens()
+                        .stream()
+                        .map(img -> img.getCaminhoImagem())
+                        .toList()
+                    : List.of());
 
         return ResponseEntity.ok(response);
     }
@@ -76,7 +91,13 @@ public class PostoRetiradaController {
                     posto.getTelefone(),
                     posto.getEmail(),
                     geom != null ? geom.getY() : null,
-                    geom != null ? geom.getX() : null);
+                    geom != null ? geom.getX() : null,
+                    posto.getImagens() != null
+                        ? posto.getImagens()
+                            .stream()
+                            .map(img -> img.getCaminhoImagem())
+                            .toList()
+                        : List.of());
 
             return ResponseEntity.ok(response);
         }).orElse(ResponseEntity.notFound().build());
@@ -109,7 +130,13 @@ public class PostoRetiradaController {
                     atualizado.getTelefone(),
                     atualizado.getEmail(),
                     geom != null ? geom.getY() : null,
-                    geom != null ? geom.getX() : null);
+                    geom != null ? geom.getX() : null,
+                    atualizado.getImagens() != null
+                        ? atualizado.getImagens()
+                            .stream()
+                            .map(img -> img.getCaminhoImagem())
+                            .toList()
+                        : List.of());
 
             return ResponseEntity.ok(response);
 
@@ -138,6 +165,12 @@ public class PostoRetiradaController {
                 posto.getTelefone(),
                 posto.getEmail(),
                 geom != null ? geom.getY() : null,
-                geom != null ? geom.getX() : null);
+                geom != null ? geom.getX() : null,
+                posto.getImagens() != null
+                    ? posto.getImagens()
+                        .stream()
+                        .map(img -> img.getCaminhoImagem())
+                        .toList()
+                    : List.of());
     }
 }

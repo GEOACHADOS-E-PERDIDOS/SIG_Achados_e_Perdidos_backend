@@ -1,5 +1,7 @@
 package ifb.edu.br.dto;
 
+import java.util.List;
+
 public record PostoRetiradaResponse(
         Integer id,
         String nome,
@@ -7,5 +9,6 @@ public record PostoRetiradaResponse(
         String telefone,
         String email,
         Double latitude,
-        Double longitude
+        Double longitude,
+        List<String> imagens
 ) {}

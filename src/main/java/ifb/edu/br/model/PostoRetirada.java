@@ -1,5 +1,7 @@
 package ifb.edu.br.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.List;
 import jakarta.persistence.*;
 import lombok.*;
 import org.locationtech.jts.geom.Point;
@@ -24,4 +26,14 @@ public class PostoRetirada {
     
     @Column(name = "geom", columnDefinition = "Geometry(Point,4326)")
 private Point geom;
+
+
+    @OneToMany(
+        mappedBy = "posto",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.EAGER
+    )
+    @JsonManagedReference
+    private List<ImagemPosto> imagens;
 }

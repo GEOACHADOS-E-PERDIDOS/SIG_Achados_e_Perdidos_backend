@@ -2,6 +2,8 @@ package ifb.edu.br.service;
 
 import ifb.edu.br.model.PostoRetirada;
 import ifb.edu.br.repository.PostoRetiradaRepository;
+import ifb.edu.br.model.ImagemPosto;
+import ifb.edu.br.repository.ImagemPostoRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -10,8 +12,11 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Coordinate;
 import org.springframework.stereotype.Service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -19,20 +24,65 @@ public class PostoRetiradaService {
 
     private final PostoRetiradaRepository postoRepository;
 
+    private final ImagemPostoRepository imagemPostoRepository;
+
+    private final ImagemPostoService imagemPostoService;
+
     // ➕ Salvar posto (com geom)
-    public PostoRetirada salvar(PostoRetirada posto,
-                               double latitude,
-                               double longitude) {
+    public PostoRetirada salvarComImagem(PostoRetirada posto, double latitude, double longitude, List<MultipartFile> imagens) {
 
-        GeometryFactory geometryFactory = new GeometryFactory();
-        Point ponto = geometryFactory.createPoint(
-                new Coordinate(longitude, latitude)
-        );
+            GeometryFactory geometryFactory =
+                    new GeometryFactory();
 
-        posto.setGeom(ponto);
+            Point ponto = geometryFactory.createPoint(
 
-        return postoRepository.save(posto);
-    }
+                    new Coordinate(longitude, latitude)
+            );
+
+            posto.setGeom(ponto);
+
+            /* ====================================== */
+            /* SALVA POSTO PRIMEIRO */
+            /* ====================================== */
+
+            PostoRetirada postoSalvo =
+                    postoRepository.save(posto);
+
+            /* ====================================== */
+            /* PROCESSA IMAGENS */
+            /* ====================================== */
+
+            List<ImagemPosto> listaImagens =
+                    new ArrayList<>();
+
+            if (imagens != null && !imagens.isEmpty()) {
+
+                for (MultipartFile imagem : imagens) {
+
+                    String caminhoImagem =
+
+                            imagemPostoService
+                                    .salvarImagemArquivo(imagem);
+
+                    ImagemPosto img =
+                            new ImagemPosto();
+
+                    img.setCaminhoImagem(caminhoImagem);
+
+                    img.setPosto(postoSalvo);
+
+                    listaImagens.add(img);
+                }
+
+                imagemPostoRepository.saveAll(
+                        listaImagens
+                );
+            }
+
+            postoSalvo.setImagens(listaImagens);
+
+            return postoRepository.save(postoSalvo);
+        }
 
     // 📋 Listar todos
     public List<PostoRetirada> listarTodos() {
