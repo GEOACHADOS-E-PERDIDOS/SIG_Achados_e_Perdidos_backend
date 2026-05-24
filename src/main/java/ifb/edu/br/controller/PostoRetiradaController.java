@@ -54,8 +54,8 @@ public class PostoRetiradaController {
                 posto.getEndereco(),
                 posto.getTelefone(),
                 posto.getEmail(),
-                geom != null ? geom.getY() : null,
-                geom != null ? geom.getX() : null,
+                geom != null && !geom.isEmpty() ? geom.getY() : null,
+                geom != null && !geom.isEmpty() ? geom.getX() : null,
                 posto.getImagens() != null
                     ? posto.getImagens()
                         .stream()
@@ -90,8 +90,8 @@ public class PostoRetiradaController {
                     posto.getEndereco(),
                     posto.getTelefone(),
                     posto.getEmail(),
-                    geom != null ? geom.getY() : null,
-                    geom != null ? geom.getX() : null,
+                    geom != null && !geom.isEmpty() ? geom.getY() : null,
+                    geom != null && !geom.isEmpty() ? geom.getX() : null,
                     posto.getImagens() != null
                         ? posto.getImagens()
                             .stream()
@@ -129,8 +129,8 @@ public class PostoRetiradaController {
                     atualizado.getEndereco(),
                     atualizado.getTelefone(),
                     atualizado.getEmail(),
-                    geom != null ? geom.getY() : null,
-                    geom != null ? geom.getX() : null,
+                    geom != null && !geom.isEmpty() ? geom.getY() : null,
+                    geom != null && !geom.isEmpty() ? geom.getX() : null,
                     atualizado.getImagens() != null
                         ? atualizado.getImagens()
                             .stream()
@@ -164,8 +164,8 @@ public class PostoRetiradaController {
                 posto.getEndereco(),
                 posto.getTelefone(),
                 posto.getEmail(),
-                geom != null ? geom.getY() : null,
-                geom != null ? geom.getX() : null,
+                geom != null && !geom.isEmpty() ? geom.getY() : null,
+                geom != null && !geom.isEmpty() ? geom.getX() : null,
                 posto.getImagens() != null
                     ? posto.getImagens()
                         .stream()

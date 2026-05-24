@@ -4,6 +4,9 @@ import ifb.edu.br.model.Usuario;
 import ifb.edu.br.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 
+import ifb.edu.br.security.UsuarioLogin;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -124,5 +127,33 @@ public class UsuarioController {
             sb.append(chars.charAt(idx));
         }
         return sb.toString();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Usuario> meuPerfil(
+            @AuthenticationPrincipal UsuarioLogin usuarioLogado) {
+
+        if (usuarioLogado == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        return ResponseEntity.ok(usuarioLogado.getUser());
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<Usuario> atualizarMeuPerfil(
+            @AuthenticationPrincipal UsuarioLogin usuarioLogado,
+            @RequestBody Usuario user) {
+
+        if (usuarioLogado == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Usuario atual = usuarioLogado.getUser();
+
+        atual.setName(user.getName());
+        atual.setEmail(user.getEmail());
+
+        return ResponseEntity.ok(userService.atualizarUsuario(atual.getId(), atual));
     }
 }

@@ -16,7 +16,7 @@ public class PostoRetirada {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_posto")
+    @Column(name = "id_posto")
     private Integer id;
 
     private String nome;

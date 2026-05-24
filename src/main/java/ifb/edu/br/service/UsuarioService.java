@@ -50,14 +50,29 @@ public class UsuarioService {
     public Usuario atualizarUsuario(Integer id, Usuario userAtualizado) {
         return userRepository.findById(id)
                 .map(user -> {
-                    user.setName(userAtualizado.getName());
-                    user.setEmail(userAtualizado.getEmail());
-                    user.setSenhaHash(userAtualizado.getSenhaHash());
-                    user.setIsAdmin(userAtualizado.getIsAdmin());
-                    user.setSenhaTemporaria(userAtualizado.getSenhaTemporaria());
+                    // CAMPOS BÁSICOS
+                    if (userAtualizado.getName() != null) {
+                        user.setName(userAtualizado.getName());
+                    }
+                    if (userAtualizado.getEmail() != null) {
+                        user.setEmail(userAtualizado.getEmail());
+                    }
+                    // CAMPOS SENSÍVEIS
+                    if (userAtualizado.getSenhaHash() != null) {
+                        user.setSenhaHash(userAtualizado.getSenhaHash());
+                    }
+                    if (userAtualizado.getIsAdmin() != null) {
+                        user.setIsAdmin(userAtualizado.getIsAdmin());
+                    }
+                    if (userAtualizado.getSenhaTemporaria() != null) {
+                        user.setSenhaTemporaria(
+                                userAtualizado.getSenhaTemporaria()
+                        );
+                    }
                     return userRepository.save(user);
                 })
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado"));
     }
 
     public Usuario tornarAdmin(Integer id) {

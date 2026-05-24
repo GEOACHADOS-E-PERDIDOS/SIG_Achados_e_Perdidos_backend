@@ -53,4 +53,6 @@ public interface ObjetoAchadoRepository extends JpaRepository<ObjetoAchado, Inte
         WHERE o.postoRetirada.id = :postoId
     """)
     long contarObjetosPorPosto(Integer postoId);
+
+    List<ObjetoAchado> findByUsuario_Id(Integer idUsuario);
 }

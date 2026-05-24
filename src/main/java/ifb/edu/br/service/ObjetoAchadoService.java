@@ -199,4 +199,32 @@ public class ObjetoAchadoService {
         return objetoRepository
                 .contarObjetosPorPosto(postoId);
     }
+
+    public List<ObjetoAchado> buscarPorUsuario(Integer idUsuario) {
+        return objetoRepository.findByUsuario_Id(idUsuario);
+    }
+
+    public ObjetoAchado atualizarStatus(
+                Integer idObjeto,
+                Integer idUsuario,
+                StatusObjeto novoStatus) {
+
+        ObjetoAchado objeto = objetoRepository
+                .findById(idObjeto)
+
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Objeto não encontrado"));
+
+        // verifica se o objeto pertence ao usuário
+        if (!objeto.getUsuario().getId().equals(idUsuario)) {
+
+                throw new RuntimeException(
+                        "Você não pode alterar este objeto");
+        }
+
+        objeto.setStatus(novoStatus);
+
+        return objetoRepository.save(objeto);
+        }
 }

@@ -45,4 +45,6 @@ public interface ObjetoPerdidoRepository extends JpaRepository<ObjetoPerdido, In
                 WHERE LOWER(op.nome) LIKE LOWER(CONCAT('%', :nome, '%'))
             """)
     List<ObjetoPerdido> buscarParaMapa(@Param("nome") String nome);
+
+    List<ObjetoPerdido> findByUsuario_Id(Integer idUsuario);
 }

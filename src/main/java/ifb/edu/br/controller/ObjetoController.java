@@ -20,10 +20,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import ifb.edu.br.model.Usuario;
+import ifb.edu.br.security.UsuarioLogin;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -42,11 +47,17 @@ public class ObjetoController {
     @PostMapping(value = "/achados", consumes = "multipart/form-data")
     public ResponseEntity<ObjetoResponse> criarAchado(
 
+            @AuthenticationPrincipal UsuarioLogin usuarioLogado,
+
             @ModelAttribute ObjetoAchadoRequest objetoRequest,
 
             @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens) {
 
         ObjetoAchado objeto = new ObjetoAchado();
+
+        Usuario usuario = usuarioLogado.getUser();
+
+        objeto.setUsuario(usuario);
 
         objeto.setNome(objetoRequest.nome());
 
@@ -106,12 +117,18 @@ public class ObjetoController {
 
     @PostMapping(value = "/perdidos", consumes = "multipart/form-data")
     public ResponseEntity<ObjetoResponse> criarPerdido(
-
+            
+            @AuthenticationPrincipal UsuarioLogin usuarioLogado,
+                 
             @ModelAttribute ObjetoPerdidoRequest objetoRequest,
 
             @RequestParam(value = "imagens", required = false) List<MultipartFile> imagens) {
 
         ObjetoPerdido objeto = new ObjetoPerdido();
+
+        Usuario usuario = usuarioLogado.getUser();
+
+        objeto.setUsuario(usuario);
 
         objeto.setNome(objetoRequest.nome());
 
@@ -504,4 +521,79 @@ public class ObjetoController {
         return ResponseEntity.ok(
                 quantidade);
     }
+
+    @GetMapping("/me")
+        public ResponseEntity<List<ObjetoResponse>> meusObjetos(
+
+                @AuthenticationPrincipal UsuarioLogin usuarioLogado) {
+
+        if (usuarioLogado == null) {
+                return ResponseEntity.status(401).build();
+        }
+
+        Integer idUsuario = usuarioLogado.getUser().getId();
+
+        List<ObjetoAchado> achados =
+                objetoAchadoService.buscarPorUsuario(idUsuario);
+
+        List<ObjetoPerdido> perdidos =
+                objetoPerdidoService.buscarPorUsuario(idUsuario);
+
+        List<ObjetoResponse> resposta = new ArrayList<>();
+
+        resposta.addAll(
+                achados.stream()
+                        .map(this::mapToResponseAchado)
+                        .toList());
+
+        resposta.addAll(
+                perdidos.stream()
+                        .map(this::mapToResponsePerdido)
+                        .toList());
+
+        return ResponseEntity.ok(resposta);
+        }
+
+        @PutMapping("/{id}/status")
+                public ResponseEntity<?> atualizarStatus(
+
+                        @PathVariable Integer id,
+
+                        @RequestBody Map<String, String> body,
+
+                        @AuthenticationPrincipal UsuarioLogin usuarioLogado) {
+
+                String novoStatus = body.get("status");
+
+                Integer idUsuario =
+                        usuarioLogado.getUser().getId();
+
+                try {
+
+                        objetoAchadoService.atualizarStatus(
+                                id,
+                                idUsuario,
+                                StatusObjeto.valueOf(novoStatus));
+
+                        return ResponseEntity.ok().build();
+
+                } catch (RuntimeException e) {
+
+                        try {
+
+                        objetoPerdidoService.atualizarStatus(
+                                id,
+                                idUsuario,
+                                StatusObjeto.valueOf(novoStatus));
+
+                        return ResponseEntity.ok().build();
+
+                        } catch (RuntimeException ex) {
+
+                        return ResponseEntity
+                                .badRequest()
+                                .body(ex.getMessage());
+                        }
+                }
+                }
 }

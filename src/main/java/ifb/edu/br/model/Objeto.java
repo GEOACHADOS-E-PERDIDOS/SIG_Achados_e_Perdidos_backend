@@ -46,4 +46,8 @@ public class Objeto {
     )
     @JsonManagedReference
     private List<ImagemObjeto> imagens;
+
+    @ManyToOne
+    @JoinColumn(name = "ID_User")
+    private Usuario usuario;
 }
