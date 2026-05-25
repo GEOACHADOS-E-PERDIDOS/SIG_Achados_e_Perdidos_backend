@@ -20,6 +20,6 @@ public record ObjetoResponse(
         Double latitudeEncontro,
         Double longitudeEncontro,
         List<Categoria> categorias,
-        StatusObjeto status
-
+        StatusObjeto status,
+        Integer postoId
 ) {}
