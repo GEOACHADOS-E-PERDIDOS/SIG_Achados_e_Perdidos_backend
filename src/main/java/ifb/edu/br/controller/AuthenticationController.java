@@ -6,6 +6,7 @@ import ifb.edu.br.model.Usuario;
 import ifb.edu.br.security.UsuarioLogin;
 import ifb.edu.br.security.TokenService;
 import ifb.edu.br.security.UsuarioDetailsServiceImpl;
+import ifb.edu.br.service.EmailService;
 import ifb.edu.br.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +32,7 @@ public class AuthenticationController {
     private final TokenService tokenService;
     private final UsuarioService userService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(
@@ -52,7 +54,7 @@ public class AuthenticationController {
                             "isAdmin", user.getIsAdmin()));
 
             Map<String, Object> resposta = new HashMap<>();
-            resposta.put("mensagem","Login realizado com sucesso!");
+            resposta.put("mensagem", "Login realizado com sucesso!");
 
             resposta.put(
                     "usuario",
@@ -72,7 +74,7 @@ public class AuthenticationController {
 
             return ResponseEntity
                     .status(401)
-                    .body(Map.of("erro","Usuário ou senha inválidos"));
+                    .body(Map.of("erro", "Usuário ou senha inválidos"));
         }
     }
 
@@ -92,28 +94,47 @@ public class AuthenticationController {
         return ResponseEntity.ok("Usuário registrado com sucesso!");
     }
 
-    @PostMapping("/recuperar-senha")
-    public ResponseEntity<String> recuperarSenha(
-            @RequestParam String email) {
+@PostMapping("/recuperar-senha")
+    public ResponseEntity<String> recuperarSenha(@RequestParam String email) {
 
         var usuarioOpt = userService.buscarPorEmail(email);
-        if (usuarioOpt.isEmpty()) {
+        
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            String senhaTemp = gerarSenhaTemporaria();
 
-            return ResponseEntity
-                    .badRequest()
-                    .body(
-                            "Email não cadastrado");
+            usuario.setSenhaHash(passwordEncoder.encode(senhaTemp));
+            usuario.setSenhaTemporaria(true);
+            userService.atualizarUsuario(usuario.getId(), usuario);
+
+            String textoEmail = """
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #dddddd; border-radius: 5px;">
+                            <h2 style="color: #2F80ED; text-align: center;">GeoAchados - Recuperação de Senha</h2>
+                            <p>Olá, <strong>%s</strong>!</p>
+                            <p>Uma nova senha temporária foi gerada para o seu acesso conforme solicitado.</p>
+
+                            <div style="background-color: #f2f2f2; padding: 15px; border-radius: 5px; text-align: center; margin: 20px 0;">
+                                <span style="font-size: 18px; font-family: monospace; letter-spacing: 2px; font-weight: bold; color: #333333;">
+                                    %s
+                                </span>
+                            </div>
+
+                            <p style="color: #ff3b30; font-size: 13px;">
+                                * Por segurança, altere esta senha assim que realizar o seu próximo login na plataforma.
+                            </p>
+                            <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 20px 0;">
+                            <p style="font-size: 12px; color: #888888; text-align: center;">Este é um e-mail automático enviado por GeoAchados, por favor não responda.</p>
+                        </div>
+                    """
+                    .formatted(usuario.getName(), senhaTemp);
+
+            emailService.enviarEmail(
+                    usuario.getEmail(),
+                    "Sua senha temporária - GeoAchados",
+                    textoEmail);
         }
-        Usuario usuario = usuarioOpt.get();
-        String senhaTemp = gerarSenhaTemporaria();
-        usuario.setSenhaHash(passwordEncoder.encode(senhaTemp));
 
-        usuario.setSenhaTemporaria(true);
-
-        userService.atualizarUsuario(usuario.getId(), usuario);
-        return ResponseEntity.ok(
-                "Senha temporária: "
-                        + senhaTemp);
+        return ResponseEntity.ok("Se o e-mail informado estiver cadastrado em nosso sistema, uma nova senha temporária será enviada em instantes.");
     }
 
     @PostMapping("/trocar-senha")

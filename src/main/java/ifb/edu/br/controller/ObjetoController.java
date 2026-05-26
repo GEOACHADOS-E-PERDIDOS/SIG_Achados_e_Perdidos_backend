@@ -437,78 +437,43 @@ public class ObjetoController {
     /* MAP RESPONSE ACHADO */
     /* ===================================================== */
 
-    private ObjetoResponse mapToResponseAchado(
-            ObjetoAchado obj) {
-
+    private ObjetoResponse mapToResponseAchado(ObjetoAchado obj) {
         return new ObjetoResponse(
-
                 obj.getId(),
-
                 obj.getNome(),
-
                 obj.getDescricao(),
-
                 obj.getEnderecoEncontro(),
-
                 obj.getDataEncontro(),
-
                 obj.getImagens() != null
-                        ? obj.getImagens()
-                                .stream()
-                                .map(img -> img.getCaminhoImagem())
-                                .toList()
+                        ? obj.getImagens().stream().map(img -> img.getCaminhoImagem()).toList()
                         : List.of(),
-
-                obj.getGeomAchado() != null
-                        ? obj.getGeomAchado().getY()
-                        : null,
-
-                obj.getGeomAchado() != null
-                        ? obj.getGeomAchado().getX()
-                        : null,
-
+                obj.getGeomAchado() != null ? obj.getGeomAchado().getY() : null,
+                obj.getGeomAchado() != null ? obj.getGeomAchado().getX() : null,
                 obj.getCategorias(),
-
-                obj.getStatus());
+                obj.getStatus(),
+                obj.getPostoRetirada() != null ? obj.getPostoRetirada().getId() : null);
     }
 
     /* ===================================================== */
     /* MAP RESPONSE PERDIDO */
     /* ===================================================== */
 
-    private ObjetoResponse mapToResponsePerdido(
-            ObjetoPerdido obj) {
-
+private ObjetoResponse mapToResponsePerdido(ObjetoPerdido obj) {
         return new ObjetoResponse(
-
                 obj.getId(),
-
                 obj.getNome(),
-
                 obj.getDescricao(),
-
                 obj.getEnderecoPerda(),
-
                 obj.getDataPerda(),
-
                 obj.getImagens() != null
-                        ? obj.getImagens()
-                                .stream()
-                                .map(img -> img.getCaminhoImagem())
-                                .toList()
+                        ? obj.getImagens().stream().map(img -> img.getCaminhoImagem()).toList()
                         : List.of(),
-
-                obj.getGeomPerdido() != null
-                        ? obj.getGeomPerdido().getY()
-                        : null,
-
-                obj.getGeomPerdido() != null
-                        ? obj.getGeomPerdido().getX()
-                        : null,
-
+                obj.getGeomPerdido() != null ? obj.getGeomPerdido().getY() : null,
+                obj.getGeomPerdido() != null ? obj.getGeomPerdido().getX() : null,
                 obj.getCategorias(),
-
-                obj.getStatus());
+                obj.getStatus(),
+                null 
+        );
     }
 
     @GetMapping("/achados/posto/{postoId}/quantidade")
