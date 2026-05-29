@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +64,7 @@ public class ObjetoAchadoService {
                                 .build();
                     })
 
-                    .toList();
+                    .collect(Collectors.toList());
 
             objeto.setImagens(listaImagens);
         }
@@ -84,7 +86,7 @@ public class ObjetoAchadoService {
                                             "Categoria não encontrada: "
                                                     + cat.getId())))
 
-                            .toList());
+                            .collect(java.util.stream.Collectors.toList()));
         }
 
         return objetoRepository.save(objeto);
@@ -126,6 +128,9 @@ public class ObjetoAchadoService {
 
                     objeto.setGeomAchado(pontoAchado);
 
+                    objeto.setPostoRetirada(
+                            objetoAtualizado.getPostoRetirada());
+
                     /* ========================================= */
                     /* CATEGORIAS */
                     /* ========================================= */
@@ -144,7 +149,7 @@ public class ObjetoAchadoService {
                                                         "Categoria não encontrada: "
                                                                 + cat.getId())))
 
-                                        .toList());
+                                        .collect(java.util.stream.Collectors.toList()));
 
                     } else {
 

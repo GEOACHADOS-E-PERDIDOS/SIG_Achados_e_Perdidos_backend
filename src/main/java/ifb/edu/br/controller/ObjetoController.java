@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -94,7 +95,7 @@ public class ObjetoController {
                                 return c;
                             })
 
-                            .toList());
+                        .collect(Collectors.toList()));
         }
 
         objeto = objetoAchadoService.salvarComImagem(
@@ -157,7 +158,7 @@ public class ObjetoController {
                                 return c;
                             })
 
-                            .toList());
+                        .collect(Collectors.toList()));
         }
 
         objeto = objetoPerdidoService.salvarComImagem(
@@ -294,7 +295,7 @@ public class ObjetoController {
                                     return c;
                                 })
 
-                                .toList());
+                                .collect(Collectors.toList()));
             }
 
             ObjetoPerdido atualizado = objetoPerdidoService.atualizar(
@@ -315,6 +316,72 @@ public class ObjetoController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PutMapping("/achados/{id}")
+        public ResponseEntity<ObjetoResponse> atualizarAchado(
+                @PathVariable Integer id,
+                @RequestBody ObjetoAchadoRequest objetoRequest) {
+        try {
+                ObjetoAchado objetoAtualizado =
+                        new ObjetoAchado();
+                objetoAtualizado.setNome(
+                        objetoRequest.nome());
+                objetoAtualizado.setDescricao(
+                        objetoRequest.descricao());
+                objetoAtualizado.setEnderecoEncontro(
+                        objetoRequest.enderecoEncontro());
+                if (
+                        objetoRequest.dataEncontro() != null &&
+                        !objetoRequest.dataEncontro().isBlank()
+                        ) {
+
+                        objetoAtualizado.setDataEncontro(
+                                LocalDate.parse(
+                                objetoRequest.dataEncontro()
+                                )
+                        );
+                        }
+
+                PostoRetirada posto =
+                        postoRetiradaService
+                                .buscarPorId(
+                                        objetoRequest.postoRetiradaId())
+                                .orElseThrow(() ->
+                                        new RuntimeException(
+                                                "Posto não encontrado"));
+                objetoAtualizado.setPostoRetirada(
+                        posto);
+                if (objetoRequest.categorias() != null) {
+                objetoAtualizado.setCategorias(
+                        objetoRequest.categorias().stream()
+                                .map(idCat -> {
+                                        Categoria c =
+                                                new Categoria();
+                                        c.setId(idCat);
+                                        return c;
+                                })
+                                .collect(Collectors.toList()));
+                }
+                ObjetoAchado atualizado =
+                        objetoAchadoService.atualizar(
+                                id,
+                                objetoAtualizado,
+                                objetoRequest.latitudeAchado(),
+                                objetoRequest.longitudeAchado());
+
+                return ResponseEntity.ok(
+                        mapToResponseAchado(
+                                atualizado));
+
+        } catch (Exception e) {
+
+                e.printStackTrace();
+
+                return ResponseEntity
+                        .badRequest()
+                        .build();
+                }
+        }
 
     /* ===================================================== */
     /* DELETAR */
@@ -439,6 +506,7 @@ public class ObjetoController {
 
     private ObjetoResponse mapToResponseAchado(ObjetoAchado obj) {
         return new ObjetoResponse(
+                
                 obj.getId(),
                 obj.getNome(),
                 obj.getDescricao(),

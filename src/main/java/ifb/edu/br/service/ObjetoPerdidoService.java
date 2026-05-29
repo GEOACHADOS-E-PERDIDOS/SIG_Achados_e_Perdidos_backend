@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +64,7 @@ public class ObjetoPerdidoService {
                                 .build();
                     })
 
-                    .toList();
+                    .collect(Collectors.toList());
 
             objeto.setImagens(listaImagens);
         }
@@ -85,7 +86,7 @@ public class ObjetoPerdidoService {
                                             "Categoria não encontrada: "
                                                     + cat.getId())))
 
-                            .toList());
+                            .collect(Collectors.toList()));
         }
 
         return objetoRepository.save(objeto);
@@ -146,7 +147,7 @@ public class ObjetoPerdidoService {
                                                                 "Categoria não encontrada: "
                                                                         + cat.getId())))
 
-                                        .toList());
+                                        .collect(Collectors.toList()));
 
                     } else {
 
