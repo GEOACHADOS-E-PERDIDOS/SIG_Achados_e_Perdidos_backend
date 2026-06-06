@@ -1,5 +1,8 @@
 package ifb.edu.br.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -36,4 +39,19 @@ public class Usuario {
 
     @Column(name = "senha_temporaria")
     private Boolean senhaTemporaria;
+
+    @Column(name = "is_posto")
+    private Boolean isPosto;
+
+    @ManyToOne
+    @JoinColumn(name = "posto_id")
+    @JsonIgnore
+    private PostoRetirada postoRetirada;
+
+    @JsonProperty("postoId")
+    public Integer getPostoId() {
+        return postoRetirada != null
+                ? postoRetirada.getId()
+                : null;
+    }
 }

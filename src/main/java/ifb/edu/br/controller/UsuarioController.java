@@ -35,6 +35,7 @@ public class UsuarioController {
         user.setDataCadastro(LocalDate.now());
         user.setIsAdmin(false);
         user.setSenhaTemporaria(false);
+        user.setIsPosto(false);
         userService.criarUsuario(user);
 
         return ResponseEntity.ok("Usuário registrado com sucesso!");
@@ -84,6 +85,16 @@ public class UsuarioController {
 
         return ResponseEntity.ok(
                 "Usuário promovido para admin com sucesso!");
+    }
+
+    @PutMapping("/{id}/tornar-posto")
+    public ResponseEntity<String> tornarPosto(
+            @PathVariable Integer id) {
+
+        userService.tornarUsuarioPosto(id);
+
+        return ResponseEntity.ok(
+                "Usuário promovido para posto com sucesso!");
     }
 
     @DeleteMapping("/{id}")

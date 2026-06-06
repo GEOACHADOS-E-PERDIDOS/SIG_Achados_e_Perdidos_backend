@@ -5,6 +5,7 @@ import ifb.edu.br.model.PostoRetirada;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.List;
 
 @Repository
@@ -15,6 +16,8 @@ public interface PostoRetiradaRepository extends JpaRepository<PostoRetirada, In
         String nome,
         String endereco
 );
+
+    Optional<PostoRetirada> findByEmail(String email);
 
 
 }

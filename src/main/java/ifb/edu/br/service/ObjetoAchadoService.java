@@ -3,6 +3,7 @@ package ifb.edu.br.service;
 import ifb.edu.br.model.ImagemObjeto;
 import ifb.edu.br.model.ObjetoAchado;
 import ifb.edu.br.model.StatusObjeto;
+import ifb.edu.br.model.Usuario;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import ifb.edu.br.repository.CategoriaRepository;
 import ifb.edu.br.repository.ObjetoAchadoRepository;
+import ifb.edu.br.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +32,7 @@ public class ObjetoAchadoService {
     private final ObjetoAchadoRepository objetoRepository;
     private final ImagemObjetoService imagemObjetoService;
     private final CategoriaRepository categoriaRepository;
+    private final UsuarioRepository usuarioRepository;
 
     public ObjetoAchado salvarComImagem(
             ObjetoAchado objeto,
@@ -216,16 +219,18 @@ public class ObjetoAchadoService {
 
         ObjetoAchado objeto = objetoRepository
                 .findById(idObjeto)
+                .orElseThrow(() -> new RuntimeException("Objeto não encontrado"));
 
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Objeto não encontrado"));
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        // verifica se o objeto pertence ao usuário
-        if (!objeto.getUsuario().getId().equals(idUsuario)) {
+        if (!Boolean.TRUE.equals(usuario.getIsPosto()) ||
+                usuario.getPostoRetirada() == null ||
+                objeto.getPostoRetirada() == null ||
+                !usuario.getPostoRetirada().getId()
+                        .equals(objeto.getPostoRetirada().getId())) {
 
-                throw new RuntimeException(
-                        "Você não pode alterar este objeto");
+                throw new RuntimeException("Somente o posto responsável pode alterar o status");
         }
 
         objeto.setStatus(novoStatus);

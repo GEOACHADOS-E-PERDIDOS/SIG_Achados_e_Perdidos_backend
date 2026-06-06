@@ -8,13 +8,19 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import ifb.edu.br.model.PostoRetirada;
+import ifb.edu.br.repository.PostoRetiradaRepository;
+
 @Service
 public class UsuarioService {
 
     private final UsuarioRepository userRepository;
 
-    public UsuarioService(UsuarioRepository userRepository) {
+    private final PostoRetiradaRepository postoRepository;
+
+    public UsuarioService(UsuarioRepository userRepository, PostoRetiradaRepository postoRepository) {
         this.userRepository = userRepository;
+        this.postoRepository = postoRepository;
     }
 
     public Usuario criarUsuario(Usuario user) {
@@ -87,5 +93,20 @@ public class UsuarioService {
 
     public void deletarUsuario(Integer id) {
         userRepository.deleteById(id);
+    }
+
+    public Usuario tornarUsuarioPosto(Integer idUsuario) {
+        Usuario usuario = userRepository.findById(idUsuario)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado"));
+
+        PostoRetirada posto = postoRepository
+                .findByEmail(usuario.getEmail())
+                .orElseThrow(() ->
+                        new RuntimeException("Não existe posto com este email"));
+
+        usuario.setIsPosto(true);
+        usuario.setPostoRetirada(posto);
+        return userRepository.save(usuario);
     }
 }
