@@ -27,7 +27,7 @@ public class Usuario {
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
 
-
+    @JsonIgnore
     @Column(name = "senha_hash", length = 200, nullable = false)
     private String senhaHash;
 
@@ -37,6 +37,7 @@ public class Usuario {
     @Column(name = "is_admin")
     private Boolean isAdmin;
 
+    @JsonIgnore
     @Column(name = "senha_temporaria")
     private Boolean senhaTemporaria;
 
